@@ -4,453 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>🇰🇷 葉家釜山之旅 2026</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css"/>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap');
+:root{--cream:#FFF8F0;--sand:#F5E6C8;--coral:#FF8A70;--coral-light:#FFCBBF;--mint:#A8D8B9;--mint-light:#D4F0DF;--sky:#87CEEB;--sky-light:#D6EEFA;--lavender:#C9B8E8;--lavender-light:#EDE5F8;--peach:#FFB347;--peach-light:#FFE4B0;--brown:#8B6F47;--white:#FFFFFF;--text-dark:#3D2B1F;--text-mid:#7A6354;--text-light:#A89080;--shadow:rgba(61,43,31,0.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans TC',sans-serif;background:var(--cream);color:var(--text-dark);min-height:100vh;overflow-x:hidden}
+.app-header{background:linear-gradient(135deg,#FF8A70 0%,#FFB347 50%,#A8D8B9 100%);padding:20px 16px 16px;text-align:center;position:relative;overflow:hidden}
+.header-deco{font-size:28px;letter-spacing:6px}
+.header-title{font-size:26px;font-weight:900;color:white;text-shadow:2px 2px 0px rgba(0,0,0,0.15);letter-spacing:2px;margin:4px 0}
+.header-sub{font-size:13px;color:rgba(255,255,255,0.92);font-weight:500;letter-spacing:1px}
+.header-badges{display:flex;gap:8px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.badge{background:rgba(255,255,255,0.85);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700;color:var(--text-dark)}
+.weather-bar{background:linear-gradient(90deg,#87CEEB22,#87CEEB44);border-left:4px solid var(--sky);margin:12px 14px;border-radius:12px;padding:10px 14px;display:flex;align-items:flex-start;gap:10px}
+.weather-bar .icon{font-size:22px;flex-shrink:0}
+.weather-bar .text{font-size:12px;color:var(--text-mid);line-height:1.6}
+.weather-bar .text strong{color:var(--text-dark)}
+.day-tabs{display:flex;gap:6px;padding:12px 14px 0;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.day-tabs::-webkit-scrollbar{display:none}
+.day-tab{flex-shrink:0;background:var(--white);border:2.5px solid var(--sand);border-radius:16px;padding:8px 14px;cursor:pointer;transition:all 0.2s ease;text-align:center;min-width:72px}
+.day-tab .day-num{font-size:10px;font-weight:700;color:var(--text-light);letter-spacing:1px}
+.day-tab .day-date{font-size:13px;font-weight:700;color:var(--text-dark)}
+.day-tab .day-label{font-size:10px;color:var(--text-mid);margin-top:1px}
+.day-tab.active{border-color:var(--coral);background:var(--coral);box-shadow:0 4px 12px rgba(255,138,112,0.35);transform:translateY(-2px)}
+.day-tab.active .day-num,.day-tab.active .day-date,.day-tab.active .day-label{color:white}
+.day-content{display:none;padding:14px 14px 90px}
+.day-content.active{display:block}
 
-  :root {
-    --cream: #FFF8F0;
-    --sand: #F5E6C8;
-    --coral: #FF8A70;
-    --coral-light: #FFCBBF;
-    --mint: #A8D8B9;
-    --mint-light: #D4F0DF;
-    --sky: #87CEEB;
-    --sky-light: #D6EEFA;
-    --lavender: #C9B8E8;
-    --lavender-light: #EDE5F8;
-    --peach: #FFB347;
-    --peach-light: #FFE4B0;
-    --brown: #8B6F47;
-    --brown-light: #C4A882;
-    --white: #FFFFFF;
-    --text-dark: #3D2B1F;
-    --text-mid: #7A6354;
-    --text-light: #A89080;
-    --shadow: rgba(61,43,31,0.12);
-  }
+/* ── VIEW TOGGLE ── */
+.view-toggle{display:flex;gap:0;margin:0 0 14px;border-radius:14px;overflow:hidden;border:2px solid var(--coral);background:var(--white)}
+.view-btn{flex:1;padding:10px 0;font-size:13px;font-weight:700;font-family:'Noto Sans TC',sans-serif;border:none;background:transparent;color:var(--coral);cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:5px}
+.view-btn.active{background:var(--coral);color:white}
+.view-pane{display:none}
+.view-pane.active{display:block}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── MAP ── */
+.map-container{border-radius:16px;overflow:hidden;border:1.5px solid var(--sand);margin-bottom:14px}
+.map-header{background:var(--coral);color:white;padding:8px 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+#map0,#map1,#map2,#map3,#map4{width:100%;height:400px}
+.map-legend{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;background:#fffaf6;border-top:1px solid var(--sand)}
+.leg{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text-mid);font-weight:500}
+.leg-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.leg-ring{width:11px;height:11px;border-radius:50%;border:2px solid;flex-shrink:0;background:transparent}
+.map-tip{padding:6px 14px 10px;background:#fffaf6;font-size:11px;color:var(--text-light);text-align:center}
 
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--cream);
-    color: var(--text-dark);
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-
-  /* ── HEADER ── */
-  .app-header {
-    background: linear-gradient(135deg, #FF8A70 0%, #FFB347 50%, #A8D8B9 100%);
-    padding: 20px 16px 16px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-  }
-  .app-header::before {
-    content: '';
-    position: absolute; inset: 0;
-    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-  }
-  .header-deco { font-size: 28px; letter-spacing: 6px; }
-  .header-title {
-    font-size: 26px; font-weight: 900; color: white;
-    text-shadow: 2px 2px 0px rgba(0,0,0,0.15);
-    letter-spacing: 2px; margin: 4px 0;
-  }
-  .header-sub {
-    font-size: 13px; color: rgba(255,255,255,0.92);
-    font-weight: 500; letter-spacing: 1px;
-  }
-  .header-badges {
-    display: flex; gap: 8px; justify-content: center;
-    margin-top: 10px; flex-wrap: wrap;
-  }
-  .badge {
-    background: rgba(255,255,255,0.85);
-    border-radius: 20px; padding: 4px 12px;
-    font-size: 12px; font-weight: 700;
-    color: var(--text-dark);
-  }
-
-  /* ── WEATHER NOTICE ── */
-  .weather-bar {
-    background: linear-gradient(90deg, #87CEEB22, #87CEEB44);
-    border-left: 4px solid var(--sky);
-    margin: 12px 14px; border-radius: 12px;
-    padding: 10px 14px;
-    display: flex; align-items: flex-start; gap: 10px;
-  }
-  .weather-bar .icon { font-size: 22px; flex-shrink: 0; }
-  .weather-bar .text { font-size: 12px; color: var(--text-mid); line-height: 1.6; }
-  .weather-bar .text strong { color: var(--text-dark); }
-
-  /* ── DAY TABS ── */
-  .day-tabs {
-    display: flex; gap: 6px;
-    padding: 12px 14px 0;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-  }
-  .day-tabs::-webkit-scrollbar { display: none; }
-  .day-tab {
-    flex-shrink: 0;
-    background: var(--white);
-    border: 2.5px solid var(--sand);
-    border-radius: 16px;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-align: center;
-    min-width: 72px;
-  }
-  .day-tab .day-num {
-    font-size: 10px; font-weight: 700;
-    color: var(--text-light); letter-spacing: 1px;
-  }
-  .day-tab .day-date {
-    font-size: 13px; font-weight: 700;
-    color: var(--text-dark);
-  }
-  .day-tab .day-label {
-    font-size: 10px; color: var(--text-mid);
-    margin-top: 1px;
-  }
-  .day-tab.active {
-    border-color: var(--coral);
-    background: var(--coral);
-    box-shadow: 0 4px 12px rgba(255,138,112,0.35);
-    transform: translateY(-2px);
-  }
-  .day-tab.active .day-num,
-  .day-tab.active .day-date,
-  .day-tab.active .day-label { color: white; }
-
-  /* ── DAY CONTENT ── */
-  .day-content { display: none; padding: 14px 14px 90px; }
-  .day-content.active { display: block; }
-
-  .day-hero {
-    border-radius: 20px; padding: 16px 18px;
-    margin-bottom: 14px; position: relative;
-    overflow: hidden;
-  }
-  .day-hero-emoji { font-size: 36px; }
-  .day-hero-title {
-    font-size: 20px; font-weight: 900;
-    color: var(--text-dark); margin: 4px 0 2px;
-    line-height: 1.3;
-  }
-  .day-hero-sub { font-size: 12px; color: var(--text-mid); }
-  .day-hero-tags { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-  .hero-tag {
-    background: rgba(255,255,255,0.7);
-    border-radius: 12px; padding: 3px 10px;
-    font-size: 11px; font-weight: 600;
-    color: var(--text-dark);
-  }
-
-  /* ── SECTION HEADER ── */
-  .section-header {
-    display: flex; align-items: center; gap: 8px;
-    margin: 18px 0 10px;
-  }
-  .section-header .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    background: var(--coral);
-    flex-shrink: 0;
-  }
-  .section-header h3 {
-    font-size: 15px; font-weight: 700;
-    color: var(--text-dark);
-  }
-  .section-divider {
-    flex: 1; height: 1px;
-    background: linear-gradient(90deg, var(--sand), transparent);
-  }
-
-  /* ── SPOT CARD ── */
-  .spot-card {
-    background: var(--white);
-    border-radius: 18px;
-    margin-bottom: 10px;
-    overflow: hidden;
-    box-shadow: 0 2px 12px var(--shadow);
-    border: 1.5px solid var(--sand);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-  .spot-card:active { transform: scale(0.98); }
-
-  .spot-card-header {
-    padding: 12px 14px;
-    display: flex; align-items: center; gap: 10px;
-    cursor: pointer;
-  }
-  .spot-icon {
-    width: 44px; height: 44px;
-    border-radius: 14px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 22px; flex-shrink: 0;
-  }
-  .spot-main { flex: 1; min-width: 0; }
-  .spot-time {
-    font-size: 11px; font-weight: 600;
-    color: var(--coral); letter-spacing: 0.5px;
-  }
-  .spot-name {
-    font-size: 15px; font-weight: 700;
-    color: var(--text-dark);
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  }
-  .spot-name-full {
-    font-size: 15px; font-weight: 700;
-    color: var(--text-dark); line-height: 1.4;
-    display: none;
-  }
-  .spot-tags { display: flex; gap: 4px; margin-top: 3px; flex-wrap: wrap; }
-  .spot-tag {
-    font-size: 10px; font-weight: 600;
-    border-radius: 8px; padding: 1px 7px;
-  }
-  .tag-food { background: #FFE4B0; color: #B8640A; }
-  .tag-spot { background: #D4F0DF; color: #1A7A45; }
-  .tag-transport { background: #D6EEFA; color: #1A5C8A; }
-  .tag-hotel { background: #EDE5F8; color: #6B3FA0; }
-  .tag-shop { background: #FFE0E0; color: #C0392B; }
-  .tag-cafe { background: #FFF0D6; color: #A0670A; }
-  .tag-optional { background: #F0F0F0; color: #666; }
-  .tag-rain { background: #D6EEFA; color: #1A5C8A; }
-
-  .spot-arrow {
-    font-size: 18px; color: var(--text-light);
-    transition: transform 0.25s ease;
-    flex-shrink: 0;
-  }
-  .spot-card.expanded .spot-arrow { transform: rotate(180deg); }
-  .spot-card.expanded .spot-name { display: none; }
-  .spot-card.expanded .spot-name-full { display: block; }
-
-  /* ── SPOT DETAIL ── */
-  .spot-detail {
-    display: none;
-    border-top: 1.5px dashed var(--sand);
-    padding: 12px 14px;
-    background: #FDFAF7;
-  }
-  .spot-card.expanded .spot-detail { display: block; }
-
-  .detail-block { margin-bottom: 10px; }
-  .detail-block:last-child { margin-bottom: 0; }
-  .detail-label {
-    font-size: 11px; font-weight: 700;
-    color: var(--text-light); letter-spacing: 1px;
-    text-transform: uppercase; margin-bottom: 4px;
-  }
-  .detail-text {
-    font-size: 13px; color: var(--text-mid);
-    line-height: 1.7;
-  }
-  .detail-text strong { color: var(--text-dark); }
-
-  .alert-box {
-    background: linear-gradient(135deg, #FFF3CD, #FFE99A);
-    border-radius: 12px; padding: 10px 12px;
-    margin-top: 8px;
-    border-left: 4px solid var(--peach);
-  }
-  .alert-box .alert-title {
-    font-size: 12px; font-weight: 700;
-    color: #8B5E00; margin-bottom: 4px;
-  }
-  .alert-box .alert-text {
-    font-size: 12px; color: #7A5200;
-    line-height: 1.65;
-  }
-
-  .info-row {
-    display: flex; gap: 6px; align-items: flex-start;
-    margin-bottom: 5px;
-  }
-  .info-row .info-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
-  .info-row .info-val { font-size: 12.5px; color: var(--text-mid); line-height: 1.5; }
-
-  .map-btn {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: linear-gradient(135deg, #FF6B6B, #FF8A70);
-    color: white; border-radius: 14px;
-    padding: 8px 16px; margin-top: 10px;
-    font-size: 13px; font-weight: 700;
-    text-decoration: none;
-    box-shadow: 0 3px 10px rgba(255,107,107,0.35);
-    transition: transform 0.15s ease;
-  }
-  .map-btn:active { transform: scale(0.96); }
-
-  .alt-options {
-    background: var(--sky-light);
-    border-radius: 12px; padding: 10px 12px;
-    margin-top: 8px;
-    border-left: 4px solid var(--sky);
-  }
-  .alt-options .alt-title {
-    font-size: 12px; font-weight: 700;
-    color: #1A5C8A; margin-bottom: 6px;
-  }
-  .alt-item {
-    font-size: 12px; color: #2C6E9A;
-    line-height: 1.6; display: flex; gap: 6px;
-  }
-
-  /* ── OPTIONAL SECTION ── */
-  .optional-section {
-    background: #F8F6FF;
-    border: 1.5px dashed var(--lavender);
-    border-radius: 16px; padding: 12px;
-    margin-top: 6px;
-  }
-  .optional-label {
-    font-size: 11px; font-weight: 700;
-    color: #8B6EB5; letter-spacing: 1px;
-    margin-bottom: 8px; display: flex; align-items: center; gap: 6px;
-  }
-
-  /* ── TIPS BOX ── */
-  .tips-box {
-    background: linear-gradient(135deg, var(--mint-light), #C8F2DC);
-    border-radius: 16px; padding: 14px 16px;
-    margin-bottom: 14px;
-    border: 1.5px solid var(--mint);
-  }
-  .tips-title {
-    font-size: 13px; font-weight: 700;
-    color: #1A6B3A; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .tips-item {
-    font-size: 12.5px; color: #2A7A49;
-    line-height: 1.7; display: flex; gap: 8px;
-  }
-  .tips-item + .tips-item { margin-top: 4px; }
-
-  /* ── FLIGHT CARD ── */
-  .flight-card {
-    background: linear-gradient(135deg, #667eea22, #764ba222);
-    border: 1.5px solid #C9B8E8;
-    border-radius: 16px; padding: 14px 16px;
-    margin-bottom: 14px;
-  }
-  .flight-row {
-    display: flex; align-items: center;
-    justify-content: space-between; gap: 8px;
-  }
-  .flight-city { text-align: center; }
-  .flight-city .city-code {
-    font-size: 22px; font-weight: 900;
-    color: var(--text-dark);
-  }
-  .flight-city .city-name {
-    font-size: 11px; color: var(--text-light);
-  }
-  .flight-center { text-align: center; flex: 1; }
-  .flight-center .plane { font-size: 24px; }
-  .flight-center .duration {
-    font-size: 11px; color: var(--text-mid);
-  }
-  .flight-info {
-    display: flex; gap: 16px; margin-top: 10px;
-    padding-top: 10px; border-top: 1px dashed var(--lavender);
-  }
-  .flight-info .fi-item { font-size: 12px; color: var(--text-mid); }
-  .flight-info .fi-item strong { color: var(--text-dark); display: block; }
-
-  /* ── CONNECTOR LINE ── */
-  .connector {
-    display: flex; align-items: center;
-    padding: 2px 0 2px 19px; gap: 8px;
-  }
-  .connector-line {
-    width: 2px; height: 20px;
-    background: repeating-linear-gradient(
-      to bottom,
-      var(--coral-light) 0px, var(--coral-light) 4px,
-      transparent 4px, transparent 8px
-    );
-    margin-left: 20px;
-  }
-
-  /* ── BOTTOM NAV ── */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(10px);
-    padding: 10px 14px 20px;
-    display: flex; gap: 8px;
-    box-shadow: 0 -2px 20px rgba(61,43,31,0.10);
-    border-top: 1px solid var(--sand);
-    z-index: 100;
-  }
-  .nav-btn {
-    flex: 1; background: var(--sand);
-    border: none; border-radius: 14px;
-    padding: 10px 6px; cursor: pointer;
-    font-family: 'Noto Sans TC', sans-serif;
-    font-size: 11px; font-weight: 700;
-    color: var(--text-mid);
-    transition: all 0.2s ease;
-    display: flex; flex-direction: column;
-    align-items: center; gap: 3px;
-  }
-  .nav-btn .nav-icon { font-size: 20px; }
-  .nav-btn.active {
-    background: var(--coral);
-    color: white;
-    box-shadow: 0 3px 10px rgba(255,138,112,0.4);
-  }
-
-  /* ── MODAL / RAIN PLAN ── */
-  .rain-toggle {
-    background: var(--sky-light);
-    border: 1.5px solid var(--sky);
-    border-radius: 14px; padding: 10px 14px;
-    margin-bottom: 10px; cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .rain-toggle .rain-icon { font-size: 20px; }
-  .rain-toggle .rain-label {
-    font-size: 13px; font-weight: 700;
-    color: #1A5C8A; flex: 1;
-  }
-  .rain-content { display: none; margin-top: 2px; }
-  .rain-content.open { display: block; }
-
-  /* ── AREA BADGE ── */
-  .area-badge {
-    display: inline-block;
-    background: var(--sand);
-    border-radius: 10px; padding: 2px 10px;
-    font-size: 11px; font-weight: 700;
-    color: var(--brown); margin-bottom: 8px;
-  }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
-
-  /* RESPONSIVE */
-  @media (min-width: 430px) {
-    .app-header { padding: 24px 20px 18px; }
-    .header-title { font-size: 30px; }
-    .day-tabs { padding: 14px 20px 0; }
-    .day-content { padding: 14px 20px 90px; }
-  }
+/* ── DAY HERO ── */
+.day-hero{border-radius:20px;padding:16px 18px;margin-bottom:14px;position:relative;overflow:hidden}
+.day-hero-emoji{font-size:36px}
+.day-hero-title{font-size:20px;font-weight:900;color:var(--text-dark);margin:4px 0 2px;line-height:1.3}
+.day-hero-sub{font-size:12px;color:var(--text-mid)}
+.day-hero-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.hero-tag{background:rgba(255,255,255,0.7);border-radius:12px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--text-dark)}
+.section-header{display:flex;align-items:center;gap:8px;margin:18px 0 10px}
+.section-header .dot{width:10px;height:10px;border-radius:50%;background:var(--coral);flex-shrink:0}
+.section-header h3{font-size:15px;font-weight:700;color:var(--text-dark)}
+.section-divider{flex:1;height:1px;background:linear-gradient(90deg,var(--sand),transparent)}
+.spot-card{background:var(--white);border-radius:18px;margin-bottom:10px;overflow:hidden;box-shadow:0 2px 12px var(--shadow);border:1.5px solid var(--sand);transition:transform 0.2s ease,box-shadow 0.2s ease}
+.spot-card:active{transform:scale(0.98)}
+.spot-card-header{padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.spot-icon{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.spot-main{flex:1;min-width:0}
+.spot-time{font-size:11px;font-weight:600;color:var(--coral);letter-spacing:0.5px}
+.spot-name{font-size:15px;font-weight:700;color:var(--text-dark);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.spot-name-full{font-size:15px;font-weight:700;color:var(--text-dark);line-height:1.4;display:none}
+.spot-tags{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap}
+.spot-tag{font-size:10px;font-weight:600;border-radius:8px;padding:1px 7px}
+.tag-food{background:#FFE4B0;color:#B8640A}
+.tag-spot{background:#D4F0DF;color:#1A7A45}
+.tag-transport{background:#D6EEFA;color:#1A5C8A}
+.tag-hotel{background:#EDE5F8;color:#6B3FA0}
+.tag-shop{background:#FFE0E0;color:#C0392B}
+.tag-cafe{background:#FFF0D6;color:#A0670A}
+.tag-optional{background:#F0F0F0;color:#666}
+.tag-rain{background:#D6EEFA;color:#1A5C8A}
+.spot-arrow{font-size:18px;color:var(--text-light);transition:transform 0.25s ease;flex-shrink:0}
+.spot-card.expanded .spot-arrow{transform:rotate(180deg)}
+.spot-card.expanded .spot-name{display:none}
+.spot-card.expanded .spot-name-full{display:block}
+.spot-detail{display:none;border-top:1.5px dashed var(--sand);padding:12px 14px;background:#FDFAF7}
+.spot-card.expanded .spot-detail{display:block}
+.detail-block{margin-bottom:10px}
+.detail-label{font-size:11px;font-weight:700;color:var(--text-light);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.detail-text{font-size:13px;color:var(--text-mid);line-height:1.7}
+.alert-box{background:linear-gradient(135deg,#FFF3CD,#FFE99A);border-radius:12px;padding:10px 12px;margin-top:8px;border-left:4px solid var(--peach)}
+.alert-box .alert-title{font-size:12px;font-weight:700;color:#8B5E00;margin-bottom:4px}
+.alert-box .alert-text{font-size:12px;color:#7A5200;line-height:1.65}
+.info-row{display:flex;gap:6px;align-items:flex-start;margin-bottom:5px}
+.info-row .info-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.info-row .info-val{font-size:12.5px;color:var(--text-mid);line-height:1.5}
+.map-btn{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FF6B6B,#FF8A70);color:white;border-radius:14px;padding:8px 16px;margin-top:10px;font-size:13px;font-weight:700;text-decoration:none;box-shadow:0 3px 10px rgba(255,107,107,0.35);transition:transform 0.15s ease}
+.map-btn:active{transform:scale(0.96)}
+.optional-section{background:#F8F6FF;border:1.5px dashed var(--lavender);border-radius:16px;padding:12px;margin-top:6px}
+.optional-label{font-size:11px;font-weight:700;color:#8B6EB5;letter-spacing:1px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tips-box{background:linear-gradient(135deg,var(--mint-light),#C8F2DC);border-radius:16px;padding:14px 16px;margin-bottom:14px;border:1.5px solid var(--mint)}
+.tips-title{font-size:13px;font-weight:700;color:#1A6B3A;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.tips-item{font-size:12.5px;color:#2A7A49;line-height:1.7;display:flex;gap:8px}
+.tips-item+.tips-item{margin-top:4px}
+.flight-card{background:linear-gradient(135deg,#667eea22,#764ba222);border:1.5px solid #C9B8E8;border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.flight-row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.flight-city{text-align:center}
+.flight-city .city-code{font-size:22px;font-weight:900;color:var(--text-dark)}
+.flight-city .city-name{font-size:11px;color:var(--text-light)}
+.flight-center{text-align:center;flex:1}
+.flight-center .plane{font-size:24px}
+.flight-center .duration{font-size:11px;color:var(--text-mid)}
+.flight-info{display:flex;gap:16px;margin-top:10px;padding-top:10px;border-top:1px dashed var(--lavender)}
+.flight-info .fi-item{font-size:12px;color:var(--text-mid)}
+.flight-info .fi-item strong{color:var(--text-dark);display:block}
+.connector-line{width:2px;height:20px;background:repeating-linear-gradient(to bottom,var(--coral-light) 0px,var(--coral-light) 4px,transparent 4px,transparent 8px);margin-left:20px}
+.rain-toggle{background:var(--sky-light);border:1.5px solid var(--sky);border-radius:14px;padding:10px 14px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:10px}
+.rain-toggle .rain-icon{font-size:20px}
+.rain-toggle .rain-label{font-size:13px;font-weight:700;color:#1A5C8A;flex:1}
+.rain-content{display:none;margin-top:2px}
+.rain-content.open{display:block}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,0.96);backdrop-filter:blur(10px);padding:10px 14px 20px;display:flex;gap:8px;box-shadow:0 -2px 20px rgba(61,43,31,0.10);border-top:1px solid var(--sand);z-index:100}
+.nav-btn{flex:1;background:var(--sand);border:none;border-radius:14px;padding:10px 6px;cursor:pointer;font-family:'Noto Sans TC',sans-serif;font-size:11px;font-weight:700;color:var(--text-mid);transition:all 0.2s ease;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn .nav-icon{font-size:20px}
+.nav-btn.active{background:var(--coral);color:white;box-shadow:0 3px 10px rgba(255,138,112,0.4)}
+.area-badge{display:inline-block;background:var(--sand);border-radius:10px;padding:2px 10px;font-size:11px;font-weight:700;color:var(--brown);margin-bottom:8px}
 </style>
 </head>
 <body>
 
-<!-- ══ HEADER ══ -->
 <div class="app-header">
   <div class="header-deco">🌊 🐟 🦅</div>
   <div class="header-title">🇰🇷 葉家釜山之旅</div>
@@ -463,1301 +138,592 @@
   </div>
 </div>
 
-<!-- ══ WEATHER NOTICE ══ -->
 <div class="weather-bar">
   <div class="icon">☔</div>
-  <div class="text">
-    <strong>梅雨季提醒：</strong>折疊傘＋防水外套必帶｜室內冷氣強備薄外套｜建議穿<strong>防水涼鞋或快乾鞋</strong>，避免整天穿濕鞋｜7/22～7/24 為釜山梅雨季尾段，需特別注意
-  </div>
+  <div class="text"><strong>梅雨季提醒：</strong>折疊傘＋防水外套必帶｜室內冷氣強備薄外套｜建議穿<strong>防水涼鞋或快乾鞋</strong></div>
 </div>
 
-<!-- ══ DAY TABS ══ -->
 <div class="day-tabs" id="dayTabs">
-  <div class="day-tab active" onclick="switchDay(0)">
-    <div class="day-num">DAY 1</div>
-    <div class="day-date">7/22</div>
-    <div class="day-label">抵達</div>
-  </div>
-  <div class="day-tab" onclick="switchDay(1)">
-    <div class="day-num">DAY 2</div>
-    <div class="day-date">7/23</div>
-    <div class="day-label">膠囊列車</div>
-  </div>
-  <div class="day-tab" onclick="switchDay(2)">
-    <div class="day-num">DAY 3</div>
-    <div class="day-date">7/24</div>
-    <div class="day-label">包車遊</div>
-  </div>
-  <div class="day-tab" onclick="switchDay(3)">
-    <div class="day-num">DAY 4</div>
-    <div class="day-date">7/25</div>
-    <div class="day-label">文化村</div>
-  </div>
-  <div class="day-tab" onclick="switchDay(4)">
-    <div class="day-num">DAY 5</div>
-    <div class="day-date">7/26</div>
-    <div class="day-label">返台</div>
-  </div>
+  <div class="day-tab active" onclick="switchDay(0)"><div class="day-num">DAY 1</div><div class="day-date">7/22</div><div class="day-label">抵達</div></div>
+  <div class="day-tab" onclick="switchDay(1)"><div class="day-num">DAY 2</div><div class="day-date">7/23</div><div class="day-label">膠囊列車</div></div>
+  <div class="day-tab" onclick="switchDay(2)"><div class="day-num">DAY 3</div><div class="day-date">7/24</div><div class="day-label">包車遊</div></div>
+  <div class="day-tab" onclick="switchDay(3)"><div class="day-num">DAY 4</div><div class="day-date">7/25</div><div class="day-label">文化村</div></div>
+  <div class="day-tab" onclick="switchDay(4)"><div class="day-num">DAY 5</div><div class="day-date">7/26</div><div class="day-label">返台</div></div>
 </div>
 
-<!-- ══════════════════════════════════
-     DAY 1
-══════════════════════════════════ -->
+<!-- ══ DAY 1 ══ -->
 <div class="day-content active" id="day0">
-
   <div class="day-hero" style="background:linear-gradient(135deg,#FFE4B0,#FFCBBF);">
     <div class="day-hero-emoji">✈️</div>
     <div class="day-hero-title">DAY 1 · 抵達釜山 → 海雲台</div>
     <div class="day-hero-sub">7月22日（三）｜住：海雲台飯店</div>
-    <div class="day-hero-tags">
-      <span class="hero-tag">🚐 包車接機</span>
-      <span class="hero-tag">🌊 海雲台區</span>
-    </div>
+    <div class="day-hero-tags"><span class="hero-tag">🚐 包車接機</span><span class="hero-tag">🌊 海雲台區</span></div>
   </div>
 
-  <!-- 航班 -->
-  <div class="flight-card">
-    <div class="flight-row">
-      <div class="flight-city">
-        <div class="city-code">TPE</div>
-        <div class="city-name">台北桃園</div>
-        <div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">07:55</div>
-      </div>
-      <div class="flight-center">
-        <div class="plane">✈️</div>
-        <div class="duration">2h 20m</div>
-        <div style="font-size:10px;color:var(--text-light)">────────</div>
-      </div>
-      <div class="flight-city">
-        <div class="city-code">PUS</div>
-        <div class="city-name">釜山金海</div>
-        <div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">11:15</div>
-      </div>
-    </div>
-    <div class="flight-info">
-      <div class="fi-item"><strong>航班</strong>CI 188</div>
-      <div class="fi-item"><strong>航空</strong>中華航空</div>
-      <div class="fi-item"><strong>接機</strong>包車司機</div>
-    </div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView(0,'schedule')">📋 行程</button>
+    <button class="view-btn" onclick="switchView(0,'map')">🗺️ 地圖</button>
   </div>
 
-  <!-- 主行程 -->
-  <div class="section-header">
-    <div class="dot"></div>
-    <h3>📍 主要行程</h3>
-    <div class="section-divider"></div>
-  </div>
-
-  <!-- 抵達 check in -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🏨</div>
-      <div class="spot-main">
-        <div class="spot-time">11:15 抵達 → 下午</div>
-        <div class="spot-name">抵達機場 → 飯店 Check-in</div>
-        <div class="spot-name-full">抵達金海機場 → 飯店 Check-in & 放行李</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-transport">🚐 包車</span>
-          <span class="spot-tag tag-hotel">🏨 住宿</span>
-        </div>
+  <div id="d0-schedule" class="view-pane active">
+    <div class="flight-card">
+      <div class="flight-row">
+        <div class="flight-city"><div class="city-code">TPE</div><div class="city-name">台北桃園</div><div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">07:55</div></div>
+        <div class="flight-center"><div class="plane">✈️</div><div class="duration">2h 20m</div><div style="font-size:10px;color:var(--text-light)">────────</div></div>
+        <div class="flight-city"><div class="city-code">PUS</div><div class="city-name">釜山金海</div><div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">11:15</div></div>
       </div>
-      <div class="spot-arrow">⌄</div>
+      <div class="flight-info"><div class="fi-item"><strong>航班</strong>CI 188</div><div class="fi-item"><strong>航空</strong>中華航空</div><div class="fi-item"><strong>接機</strong>包車司機</div></div>
     </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🚐</span><span class="info-val">包車司機在機場出口等待，直接前往海雲台飯店</span></div>
-      <div class="info-row"><span class="info-icon">🧳</span><span class="info-val">大行李含推車最多可放 12 件，提前確認</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 入境提醒</div>
-        <div class="alert-text">韓國入境需填寫 K-ETA（提前申請）或現場填寫入境卡。帶小孩注意推車通道指引。</div>
-      </div>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 午餐豬肉湯飯 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🍲</div>
-      <div class="spot-main">
-        <div class="spot-time">下午 / 到了再說</div>
-        <div class="spot-name">午餐 — 豬肉湯飯（海雲台）</div>
-        <div class="spot-name-full">午餐 — 豬肉湯飯（海雲台區）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍜 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">推薦名單（擇一）</div>
-      <div class="info-row"><span class="info-icon">1️⃣</span><span class="info-val"><strong>密陽血腸豬肉湯飯</strong> — 24 小時，湯頭濃郁</span></div>
-      <div class="info-row"><span class="info-icon">2️⃣</span><span class="info-val"><strong>嚴湧帛豬肉湯飯</strong> — 湯頭清甜，08:00–21:00（平日 15:00–17:00 休息）</span></div>
-      <div class="info-row"><span class="info-icon">3️⃣</span><span class="info-val"><strong>五福豬肉湯飯</strong> — 濃厚清爽兼具</span></div>
-      <div class="info-row"><span class="info-icon">4️⃣</span><span class="info-val"><strong>水邊最高豬肉湯飯</strong> — 湯底最濃最香，但豬腥味較重，看個人口味</span></div>
-      <div class="alert-box">
-        <div class="alert-title">👶 長輩/小孩提醒</div>
-        <div class="alert-text">湯飯口味偏重，可請店員給白飯配湯。2 歲幼童可分食白粥或軟飯部分。</div>
-      </div>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- Club D Oasis -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🛁</div>
-      <div class="spot-main">
-        <div class="spot-time">下午（10:00–21:30）</div>
-        <div class="spot-name">Club D Oasis 海景汗蒸幕</div>
-        <div class="spot-name-full">Club D Oasis — 釜山五星級海景汗蒸幕</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🧖 景點</span>
-          <span class="spot-tag tag-optional">📌 擇一</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">地點</div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">海雲台 LCT Land Mark Tower（Busan X the Sky 同棟）</span></div>
-      <div class="detail-label" style="margin-top:8px">設施層數</div>
-      <div class="info-row"><span class="info-icon">4️⃣</span><span class="info-val"><strong>4F</strong> 戶外水上樂園（需穿泳衣）</span></div>
-      <div class="info-row"><span class="info-icon">5️⃣</span><span class="info-val"><strong>5F</strong> 露天溫泉 SPA（國家指定保養溫泉）</span></div>
-      <div class="info-row"><span class="info-icon">6️⃣</span><span class="info-val"><strong>6F</strong> 海景汗蒸幕＋露天泡腳池（拍照最美）</span></div>
-      <div class="detail-label" style="margin-top:8px">票種</div>
-      <div class="info-row"><span class="info-icon">🎫</span><span class="info-val">純汗蒸幕券 or 全場通票（水上樂園＋水療）｜平日約 NT$680–740</span></div>
-      <div class="info-row"><span class="info-icon">🅿️</span><span class="info-val">持釜山通行證（VBP）可免費兌換汗蒸幕入場</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 重要年齡限制</div>
-        <div class="alert-text">• 4 歲以上兒童不可跟異性父母進更衣室（7 歲小男生 ≠ 女湯），請提前分配大人照顧<br>• 2 歲幼童進水上樂園須穿<strong>防水尿布</strong><br>• 搓澡服務在 5F，進去後先預約登記</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/Club+D+Oasis+해운대" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- BUSAN X the SKY -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D6EEFA">🏙️</div>
-      <div class="spot-main">
-        <div class="spot-time">下午（可與汗蒸幕擇一）</div>
-        <div class="spot-name">BUSAN X the SKY 101樓觀景台</div>
-        <div class="spot-name-full">BUSAN X the SKY — LCT 101 樓觀景台</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🌆 景點</span>
-          <span class="spot-tag tag-optional">📌 擇一</span>
-          <span class="spot-tag tag-rain">🌧️ 雨天OK</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">海雲台 LCT Land Mark Tower（與 Club D Oasis 同棟）</span></div>
-      <div class="info-row"><span class="info-icon">⭐</span><span class="info-val">釜山全景、廣安大橋、釜山塔一覽無遺</span></div>
-      <div class="info-row"><span class="info-icon">🌧️</span><span class="info-val">雨天雲霧繚繞別有浪漫感</span></div>
-      <div class="alert-box">
-        <div class="alert-title">💡 建議</div>
-        <div class="alert-text">第一天行程已經很累，<strong>Club D Oasis 和觀景台選一個</strong>就好，不必兩個都去。推薦帶長輩去汗蒸幕休息。</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/Busan+X+the+Sky" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 晚餐 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🥩</div>
-      <div class="spot-main">
-        <div class="spot-time">晚餐</div>
-        <div class="spot-name">晚餐 — 烤肉 / 海雲台市場</div>
-        <div class="spot-name-full">晚餐選擇 — 烤肉 or 海雲台傳統市場</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍖 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">選項 A — 烤肉</div>
-      <div class="info-row"><span class="info-icon">🥩</span><span class="info-val"><strong>味贊王鹽烤肉海雲台</strong>：12:00–15:00 / 17:00–23:00，評價兩極</span></div>
-      <div class="info-row"><span class="info-icon">🥩</span><span class="info-val"><strong>伍班長烤肉</strong>：11:00–04:00，需自己動手烤</span></div>
-      <div class="detail-label" style="margin-top:8px">選項 B — 海雲台傳統市場</div>
-      <div class="info-row"><span class="info-icon">🍜</span><span class="info-val"><strong>海雲台 31cm 刀削麵</strong>：10:50–21:30（14:40–16:00 休息），一碗 ₩10,000，CP值超高</span></div>
-      <div class="info-row"><span class="info-icon">🌯</span><span class="info-val"><strong>尚國家飯捲</strong>：辣炒年糕醬濃郁，道地韓式小吃</span></div>
-      <div class="info-row"><span class="info-icon">🕙</span><span class="info-val">市場營業：09:00–22:00</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/해운대+전통시장" target="_blank">🗺️ 市場地圖</a>
-    </div>
-  </div>
-
-  <!-- 周邊彈性景點 -->
-  <div class="section-header" style="margin-top:22px">
-    <div class="dot" style="background:var(--lavender)"></div>
-    <h3>🗺️ 海雲台周邊 — 彈性備選</h3>
-    <div class="section-divider"></div>
-  </div>
-  <div class="optional-section">
-    <div class="optional-label">🔵 以下景點可依當天體力、時間彈性加入</div>
-
+    <div class="section-header"><div class="dot"></div><h3>📍 主要行程</h3><div class="section-divider"></div></div>
     <div class="spot-card" onclick="toggleCard(this)">
-      <div class="spot-card-header">
-        <div class="spot-icon" style="background:#D6EEFA">🐠</div>
-        <div class="spot-main">
-          <div class="spot-time">任意時間</div>
-          <div class="spot-name">SEA LIFE 釜山水族館</div>
-          <div class="spot-name-full">SEA LIFE 釜山水族館（海雲台）</div>
-          <div class="spot-tags">
-            <span class="spot-tag tag-spot">🐟 景點</span>
-            <span class="spot-tag tag-rain">🌧️ 雨天首選</span>
-          </div>
-        </div>
-        <div class="spot-arrow">⌄</div>
-      </div>
-      <div class="spot-detail">
-        <div class="info-row"><span class="info-icon">📍</span><span class="info-val">海雲台海水浴場旁，步行可達</span></div>
-        <div class="info-row"><span class="info-icon">👶</span><span class="info-val">小孩超愛！有鯊魚隧道，推車可進入</span></div>
-        <div class="info-row"><span class="info-icon">🌧️</span><span class="info-val">DAY 2 雨天備選主力景點</span></div>
-        <a class="map-btn" href="https://map.kakao.com/link/search/씨라이프+부산아쿠아리움" target="_blank">🗺️ Kakao Maps 導航</a>
-      </div>
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🏨</div><div class="spot-main"><div class="spot-time">11:15 抵達</div><div class="spot-name">抵達機場 → 飯店 Check-in</div><div class="spot-name-full">抵達金海機場 → 飯店 Check-in & 放行李</div><div class="spot-tags"><span class="spot-tag tag-transport">🚐 包車</span><span class="spot-tag tag-hotel">🏨 住宿</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🚐</span><span class="info-val">包車司機在機場出口等待，直接前往海雲台飯店</span></div><div class="info-row"><span class="info-icon">🧳</span><span class="info-val">大行李含推車最多可放 12 件</span></div></div>
     </div>
-
-    <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
-      <div class="spot-card-header">
-        <div class="spot-icon" style="background:#FFE4B0">🏖️</div>
-        <div class="spot-main">
-          <div class="spot-time">傍晚散步</div>
-          <div class="spot-name">海雲台海水浴場海邊散步</div>
-          <div class="spot-name-full">海雲台海水浴場 — 傍晚散步</div>
-          <div class="spot-tags">
-            <span class="spot-tag tag-spot">🌊 景點</span>
-            <span class="spot-tag tag-optional">免費</span>
-          </div>
-        </div>
-        <div class="spot-arrow">⌄</div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🍲</div><div class="spot-main"><div class="spot-time">午餐</div><div class="spot-name">午餐 — 豬肉湯飯（海雲台）</div><div class="spot-name-full">午餐 — 豬肉湯飯（海雲台區）</div><div class="spot-tags"><span class="spot-tag tag-food">🍜 飲食</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="detail-label">推薦名單（擇一）</div><div class="info-row"><span class="info-icon">1️⃣</span><span class="info-val"><strong>密陽血腸豬肉湯飯</strong> — 24小時，湯頭濃郁</span></div><div class="info-row"><span class="info-icon">2️⃣</span><span class="info-val"><strong>嚴湧帛豬肉湯飯</strong> — 湯頭清甜，08:00–21:00</span></div><div class="info-row"><span class="info-icon">3️⃣</span><span class="info-val"><strong>五福豬肉湯飯</strong> — 濃厚清爽兼具</span></div><a class="map-btn" href="https://map.kakao.com/link/search/돼지국밥+해운대" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🛁</div><div class="spot-main"><div class="spot-time">下午（擇一）</div><div class="spot-name">Club D Oasis 海景汗蒸幕</div><div class="spot-name-full">Club D Oasis — 釜山五星級海景汗蒸幕</div><div class="spot-tags"><span class="spot-tag tag-spot">🧖 景點</span><span class="spot-tag tag-optional">📌 擇一</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📍</span><span class="info-val">海雲台 LCT Land Mark Tower 4–6F</span></div><div class="info-row"><span class="info-icon">🎫</span><span class="info-val">純汗蒸幕券 or 全場通票｜平日約 NT$680–740</span></div><div class="alert-box"><div class="alert-title">⚠️ 重要年齡限制</div><div class="alert-text">• 4 歲以上兒童不可跟異性父母進更衣室<br>• 2 歲幼童進水上樂園須穿防水尿布</div></div><a class="map-btn" href="https://map.kakao.com/link/search/클럽디오아시스" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🏙️</div><div class="spot-main"><div class="spot-time">下午（可與汗蒸幕擇一）</div><div class="spot-name">BUSAN X the SKY 101樓觀景台</div><div class="spot-name-full">BUSAN X the SKY — LCT 101 樓觀景台</div><div class="spot-tags"><span class="spot-tag tag-spot">🌆 景點</span><span class="spot-tag tag-optional">📌 擇一</span><span class="spot-tag tag-rain">🌧️ 雨天OK</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">⭐</span><span class="info-val">釜山全景、廣安大橋、釜山塔一覽無遺</span></div><a class="map-btn" href="https://map.kakao.com/link/search/부산엑스더스카이" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🥩</div><div class="spot-main"><div class="spot-time">晚餐</div><div class="spot-name">晚餐 — 烤肉 / 海雲台市場</div><div class="spot-name-full">晚餐選擇 — 烤肉 or 海雲台傳統市場</div><div class="spot-tags"><span class="spot-tag tag-food">🍖 飲食</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🥩</span><span class="info-val"><strong>味贊王鹽烤肉</strong>：17:00–23:00</span></div><div class="info-row"><span class="info-icon">🍜</span><span class="info-val"><strong>海雲台 31cm 刀削麵</strong>：10:50–21:30，₩10,000</span></div><a class="map-btn" href="https://map.kakao.com/link/search/해운대전통시장" target="_blank">🗺️ 市場地圖</a></div>
+    </div>
+    <div class="section-header" style="margin-top:22px"><div class="dot" style="background:var(--lavender)"></div><h3>🗺️ 海雲台周邊 — 彈性備選</h3><div class="section-divider"></div></div>
+    <div class="optional-section">
+      <div class="optional-label">🔵 依當天體力、時間彈性加入</div>
+      <div class="spot-card" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🐠</div><div class="spot-main"><div class="spot-time">任意時間</div><div class="spot-name">SEA LIFE 釜山水族館</div><div class="spot-name-full">SEA LIFE 釜山水族館（海雲台）</div><div class="spot-tags"><span class="spot-tag tag-spot">🐟 景點</span><span class="spot-tag tag-rain">🌧️ 雨天首選</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">👶</span><span class="info-val">小孩超愛！有鯊魚隧道，推車可進入</span></div><a class="map-btn" href="https://map.kakao.com/link/search/씨라이프부산아쿠아리움" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
-      <div class="spot-detail">
-        <div class="info-row"><span class="info-icon">🌅</span><span class="info-val">傍晚的海雲台沙灘風景最美，適合飯後散步</span></div>
-        <div class="info-row"><span class="info-icon">👶</span><span class="info-val">小孩可以在沙灘玩沙，長輩坐著吹海風</span></div>
-        <a class="map-btn" href="https://map.kakao.com/link/search/해운대해수욕장" target="_blank">🗺️ Kakao Maps 導航</a>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🏖️</div><div class="spot-main"><div class="spot-time">傍晚散步</div><div class="spot-name">海雲台海水浴場散步</div><div class="spot-name-full">海雲台海水浴場 — 傍晚散步</div><div class="spot-tags"><span class="spot-tag tag-spot">🌊 景點</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌅</span><span class="info-val">傍晚沙灘風景最美，長輩坐著吹海風</span></div><a class="map-btn" href="https://map.kakao.com/link/search/해운대해수욕장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🌿</div><div class="spot-main"><div class="spot-time">任意時間</div><div class="spot-name">冬柏島 동백섬</div><div class="spot-name-full">冬柏島 — 海雲台旁免費小島散步</div><div class="spot-tags"><span class="spot-tag tag-spot">🌿 散步</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌿</span><span class="info-val">海雲台旁免費小島，傍晚散步很美，老人小孩都適合</span></div><div class="info-row"><span class="info-icon">🚶</span><span class="info-val">步行約 30 分鐘繞一圈，輕鬆愜意</span></div><a class="map-btn" href="https://map.kakao.com/link/search/동백섬+해운대" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🚶</div><div class="spot-main"><div class="spot-time">任意時間</div><div class="spot-name">海雲台 Blueline Park 海岸步道</div><div class="spot-name-full">海雲台 Blueline Park — 海岸步道漫步</div><div class="spot-tags"><span class="spot-tag tag-spot">🌊 散步</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌊</span><span class="info-val">沿海岸的免費步道，可遠眺大海，明天搭列車的起點附近</span></div><a class="map-btn" href="https://map.kakao.com/link/search/블루라인파크+해운대" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
     </div>
   </div>
 
+  <div id="d0-map" class="view-pane">
+    <div class="map-container">
+      <div class="map-header">🗺️ DAY 1 · 海雲台區景點地圖</div>
+      <div id="map0"></div>
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#FF6B6B"></div>飲食</div>
+        <div class="leg"><div class="leg-dot" style="background:#4ECDC4"></div>景點/體驗</div>
+        <div class="leg"><div class="leg-dot" style="background:#9B59B6"></div>住宿</div>
+        <div class="leg"><div class="leg-dot" style="background:#F39C12"></div>購物</div>
+        <div class="leg"><div class="leg-ring" style="border-color:#4ECDC4"></div>備案景點</div>
+      </div>
+      <div class="map-tip">實心圓=主行程　空心圓=備案　點標記看詳情</div>
+    </div>
+  </div>
 </div>
 
-
-<!-- ══════════════════════════════════
-     DAY 2
-══════════════════════════════════ -->
+<!-- ══ DAY 2 ══ -->
 <div class="day-content" id="day1">
-
   <div class="day-hero" style="background:linear-gradient(135deg,#D6EEFA,#A8D8B9);">
     <div class="day-hero-emoji">🚞</div>
     <div class="day-hero-title">DAY 2 · 膠囊列車 → 廣安里</div>
     <div class="day-hero-sub">7月23日（四）｜住：海雲台飯店</div>
-    <div class="day-hero-tags">
-      <span class="hero-tag">🌊 青沙浦</span>
-      <span class="hero-tag">🏬 新世界百貨</span>
-      <span class="hero-tag">🌉 廣安里夜景</span>
+    <div class="day-hero-tags"><span class="hero-tag">🌊 青沙浦</span><span class="hero-tag">🏬 新世界百貨</span><span class="hero-tag">🌉 廣安里夜景</span></div>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView(1,'schedule')">📋 行程</button>
+    <button class="view-btn" onclick="switchView(1,'map')">🗺️ 地圖</button>
+  </div>
+  <div id="d1-schedule" class="view-pane active">
+    <div class="rain-toggle" onclick="toggleRain(this)"><span class="rain-icon">🌧️</span><span class="rain-label">雨天備案 — 點擊展開</span><span>▸</span></div>
+    <div class="rain-content"><div class="tips-box"><div class="tips-title">🌧️ DAY 2 雨天行程</div><div class="tips-item"><span>🐠</span><span><strong>SEA LIFE 水族館</strong>（海雲台）→ 室內全程</span></div><div class="tips-item"><span>🏬</span><span><strong>新世界百貨</strong> → B2 潮牌、9F 恐龍公園</span></div><div class="tips-item"><span>🌉</span><span><strong>廣安里晚餐 + 夜景</strong></span></div></div></div>
+    <div class="section-header"><div class="dot"></div><h3>📍 主要行程</h3><div class="section-divider"></div></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">☕</div><div class="spot-main"><div class="spot-time">08:00 起</div><div class="spot-name">早餐 — Working Holiday Brunch Cafe</div><div class="spot-name-full">킹홀리데이 해운대 — Working Holiday Brunch Cafe</div><div class="spot-tags"><span class="spot-tag tag-food">🥞 早餐</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🕗</span><span class="info-val">每日 08:00–21:30，海雲台沙灘正對面高樓</span></div><div class="alert-box"><div class="alert-title">⏰ 提醒</div><div class="alert-text">今天要 09:00 前出發搭膠囊列車，早餐要快！</div></div><a class="map-btn" href="https://map.kakao.com/link/search/킹홀리데이+해운대" target="_blank">🗺️ Kakao Maps 導航</a></div>
     </div>
-  </div>
-
-  <!-- 雨天備案 -->
-  <div class="rain-toggle" onclick="toggleRain(this)">
-    <span class="rain-icon">🌧️</span>
-    <span class="rain-label">雨天備案 — 點擊展開</span>
-    <span>▸</span>
-  </div>
-  <div class="rain-content">
-    <div class="tips-box">
-      <div class="tips-title">🌧️ DAY 2 雨天行程</div>
-      <div class="tips-item"><span>🐠</span><span><strong>SEA LIFE 釜山水族館</strong>（海雲台）→ 室內全程，推車可入</span></div>
-      <div class="tips-item"><span>🏬</span><span><strong>新世界百貨</strong> → 逛 B2 潮牌、9F 恐龍公園</span></div>
-      <div class="tips-item"><span>🌉</span><span><strong>廣安里晚餐 + 夜景</strong> → 雨天廣安大橋反而更有氣氛</span></div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🚞</div><div class="spot-main"><div class="spot-time">09:00（建議）</div><div class="spot-name">膠囊列車 / 海岸列車</div><div class="spot-name-full">膠囊列車 / 海岸列車 — 尾浦 → 青沙浦</div><div class="spot-tags"><span class="spot-tag tag-transport">🚞 交通</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🚞</span><span class="info-val"><strong>膠囊列車</strong>：需提前預訂，夏天無冷氣</span></div><div class="info-row"><span class="info-icon">🚂</span><span class="info-val"><strong>海岸列車</strong>：持釜山 Pass 現場換票</span></div><div class="alert-box"><div class="alert-title">🌞 最佳時段</div><div class="alert-text">09:00 出發最理想：人少、不熱、光線美</div></div><a class="map-btn" href="https://map.kakao.com/link/search/미포역+블루라인파크" target="_blank">🗺️ 尾浦站地圖</a></div>
     </div>
-  </div>
-
-  <div class="section-header">
-    <div class="dot"></div>
-    <h3>📍 主要行程</h3>
-    <div class="section-divider"></div>
-  </div>
-
-  <!-- 早餐 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">☕</div>
-      <div class="spot-main">
-        <div class="spot-time">08:00 起</div>
-        <div class="spot-name">早餐 — Working Holiday Brunch Cafe</div>
-        <div class="spot-name-full">킹홀리데이 해운대 — Working Holiday Brunch Cafe & Bakery</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🥞 早餐</span>
-          <span class="spot-tag tag-cafe">☕ 咖啡廳</span>
-        </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🦪</div><div class="spot-main"><div class="spot-time">午餐</div><div class="spot-name">午餐 — 青沙浦烤貝（海林家）</div><div class="spot-name-full">青沙浦烤貝午餐 — 海林家 / 道熙家</div><div class="spot-tags"><span class="spot-tag tag-food">🦪 飲食</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🥇</span><span class="info-val"><strong>海林家</strong>：30年老字號，木頭桌椅，8人最友善</span></div><div class="alert-box"><div class="alert-title">📢 入店必做</div><div class="alert-text">告知「Eight people + Stroller」，要求一般高度方桌</div></div><a class="map-btn" href="https://map.kakao.com/link/search/청사포+해림식당" target="_blank">🗺️ 海林家地圖</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFF0D6">☕</div><div class="spot-main"><div class="spot-time">午後</div><div class="spot-name">青沙浦海景咖啡廳 BRONI</div><div class="spot-name-full">BRONI 브로니 — 青沙浦海景咖啡廳</div><div class="spot-tags"><span class="spot-tag tag-cafe">☕ 咖啡廳</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🍰</span><span class="info-val">必點：<strong>巴斯克乳酪蛋糕</strong>｜有懶骨頭座位區</span></div><a class="map-btn" href="https://map.kakao.com/link/search/브로니+청사포" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">🏬</div><div class="spot-main"><div class="spot-time">下午</div><div class="spot-name">新世界百貨 Centum City</div><div class="spot-name-full">新世界百貨 Centum City — 逛街＋恐龍公園</div><div class="spot-tags"><span class="spot-tag tag-shop">🛍️ 逛街</span><span class="spot-tag tag-rain">🌧️ 雨天OK</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🦕</span><span class="info-val"><strong>9F 恐龍公園</strong> — 小孩必去！</span></div><div class="info-row"><span class="info-icon">👕</span><span class="info-val">B2 潮牌 / B1 美食伴手禮 / 1F 精品</span></div><a class="map-btn" href="https://map.kakao.com/link/search/신세계백화점+센텀시티" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🌉</div><div class="spot-main"><div class="spot-time">晚餐＋夜景</div><div class="spot-name">廣安里 — 晚餐 & 夜景</div><div class="spot-name-full">廣安里 — Musoe泡菜五花肉 + 廣安大橋夜景</div><div class="spot-tags"><span class="spot-tag tag-food">🥩 飲食</span><span class="spot-tag tag-spot">🌉 夜景</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🥩</span><span class="info-val"><strong>Musoe 泡菜五花肉</strong>（廣安店）</span></div><div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 수영구 남천바다로33번길 27</span></div><a class="map-btn" href="https://map.kakao.com/link/search/무쇠김치삼겹+광안점" target="_blank">🗺️ 餐廳地圖</a></div>
+    </div>
+    <div class="section-header" style="margin-top:22px"><div class="dot" style="background:var(--lavender)"></div><h3>🗺️ 廣安里周邊 — 彈性備選</h3><div class="section-divider"></div></div>
+    <div class="optional-section">
+      <div class="optional-label">🔵 依當天體力彈性加入</div>
+      <div class="spot-card" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFE0E0">💊</div><div class="spot-main"><div class="spot-time">下午/晚餐前</div><div class="spot-name">Olive Young 廣安里店</div><div class="spot-tags"><span class="spot-tag tag-shop">💄 購物</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">💄</span><span class="info-val">韓系保養品、彩妝、零食伴手禮一次買齊</span></div><a class="map-btn" href="https://map.kakao.com/link/search/올리브영+광안리" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🕗</span><span class="info-val">每日 08:00–21:30</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">海雲台沙灘正對面高樓，景觀極佳</span></div>
-      <div class="detail-label" style="margin-top:8px">推薦餐點</div>
-      <div class="info-row"><span class="info-icon">🍞</span><span class="info-val">法式吐司 ₩16,000（約 NT$350）</span></div>
-      <div class="info-row"><span class="info-icon">🍳</span><span class="info-val">燻鮭魚班尼迪克蛋 ₩19,000（約 NT$420）</span></div>
-      <div class="info-row"><span class="info-icon">🍽️</span><span class="info-val">澳洲大早餐 ₩24,000（約 NT$520）</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⏰ 時間提醒</div>
-        <div class="alert-text">今天要 09:00 前出發搭膠囊列車，早餐要快吃完！建議 08:00 準時到，避免 09:00 後人潮。</div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🌉</div><div class="spot-main"><div class="spot-time">晚餐後</div><div class="spot-name">民樂水邊公園（廣安大橋夜景最佳點）</div><div class="spot-tags"><span class="spot-tag tag-spot">🌉 夜景</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">📸</span><span class="info-val">廣安大橋夜景最佳拍攝點，免費</span></div><a class="map-btn" href="https://map.kakao.com/link/search/민락수변공원" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/킹홀리데이+해운대" target="_blank">🗺️ Kakao Maps 導航</a>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🦞</div><div class="spot-main"><div class="spot-time">彈性</div><div class="spot-name">廣安里水產市場</div><div class="spot-tags"><span class="spot-tag tag-food">🦞 海鮮</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🦞</span><span class="info-val">新鮮海產直接現買現烤，道地釜山體驗</span></div><a class="map-btn" href="https://map.kakao.com/link/search/광안리수산시장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
     </div>
   </div>
-  <div class="connector-line"></div>
-
-  <!-- 鹽麵包 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFF0D6">🥐</div>
-      <div class="spot-main">
-        <div class="spot-time">出發前順道</div>
-        <div class="spot-name">自然島鹽麵包（順道買）</div>
-        <div class="spot-name-full">自然島鹽麵包 — 出發前順道買</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🥐 小吃</span>
-          <span class="spot-tag tag-optional">可跳過</span>
-        </div>
+  <div id="d1-map" class="view-pane">
+    <div class="map-container">
+      <div class="map-header">🗺️ DAY 2 · 青沙浦→新世界→廣安里</div>
+      <div id="map1"></div>
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#FF6B6B"></div>飲食</div>
+        <div class="leg"><div class="leg-dot" style="background:#4ECDC4"></div>景點/體驗</div>
+        <div class="leg"><div class="leg-dot" style="background:#F39C12"></div>購物</div>
+        <div class="leg"><div class="leg-ring" style="border-color:#FF6B6B"></div>備案</div>
       </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">💰</span><span class="info-val">一袋 4 顆 ₩12,000，每天固定時間出爐</span></div>
-      <div class="info-row"><span class="info-icon">⭐</span><span class="info-val">熱騰騰吃超美味，冷掉也好吃</span></div>
-      <div class="info-row"><span class="info-icon">💡</span><span class="info-val">人多可分食，一袋夠 2 人</span></div>
+      <div class="map-tip">實心圓=主行程　空心圓=備案　點標記看詳情</div>
     </div>
   </div>
-  <div class="connector-line"></div>
-
-  <!-- 膠囊列車 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D6EEFA">🚞</div>
-      <div class="spot-main">
-        <div class="spot-time">09:00（建議）</div>
-        <div class="spot-name">膠囊列車 or 海岸列車</div>
-        <div class="spot-name-full">膠囊列車 / 海岸列車 — 尾浦 → 青沙浦</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-transport">🚞 交通</span>
-          <span class="spot-tag tag-spot">🌊 景點</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">兩種選擇的差異</div>
-      <div class="info-row"><span class="info-icon">🚞</span><span class="info-val"><strong>膠囊列車（上軌道）</strong>：需提前預訂 ⚠️ 夏天無冷氣，很熱</span></div>
-      <div class="info-row"><span class="info-icon">🚂</span><span class="info-val"><strong>海岸列車（下軌道）</strong>：持釜山 Pass 現場換票，不需預約</span></div>
-      <div class="detail-label" style="margin-top:8px">釜山 Pass 持有者</div>
-      <div class="info-row"><span class="info-icon">✅</span><span class="info-val">海岸列車不需預約，直接去尾浦/青沙浦現場換票</span></div>
-      <div class="info-row"><span class="info-icon">⚠️</span><span class="info-val">不需預約 ≠ 不需排隊！旺季建議提早到</span></div>
-      <div class="alert-box">
-        <div class="alert-title">🌞 最佳搭乘時段</div>
-        <div class="alert-text">09:00 出發最理想：人少、不熱、光線美。10 點後人潮爆多，下午最熱最擁擠。膠囊列車訂票時間：2026/06/22（一）台灣時間晚上 11:00 搶票！</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/미포역+블루라인파크" target="_blank">🗺️ 尾浦站地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 青沙浦天空步道 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🌉</div>
-      <div class="spot-main">
-        <div class="spot-time">抵達青沙浦後</div>
-        <div class="spot-name">青沙浦踏石天空步道</div>
-        <div class="spot-name-full">青沙浦踏石天空步道（可跳過）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">👣 景點</span>
-          <span class="spot-tag tag-optional">可跳過</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">💡</span><span class="info-val">若天氣太熱或下雨，可直接跳過</span></div>
-      <div class="info-row"><span class="info-icon">👴</span><span class="info-val">步道有一定距離，長輩體力許可再去</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/청사포+다릿돌전망대" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 青沙浦午餐烤貝 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🦪</div>
-      <div class="spot-main">
-        <div class="spot-time">午餐</div>
-        <div class="spot-name">午餐 — 青沙浦烤貝（海林家）</div>
-        <div class="spot-name-full">青沙浦烤貝午餐 — 海林家 / 道熙家</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🦪 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">推薦順位</div>
-      <div class="info-row"><span class="info-icon">🥇</span><span class="info-val"><strong>海林家（Haerim）</strong>：30 年老字號，木頭桌椅最適合 8 人併桌，長輩最友善</span></div>
-      <div class="info-row"><span class="info-icon">🥈</span><span class="info-val"><strong>道熙家</strong>：海景第一排，二樓大窗景色最美，但座位較不舒適</span></div>
-      <div class="alert-box">
-        <div class="alert-title">📢 入店必做</div>
-        <div class="alert-text">進門告知：「Eight people + Stroller（推車）」，請安排<strong>一般高度方桌</strong>，不要坐圓鐵桶桌或炕席，長輩和小孩都更舒服！</div>
-      </div>
-      <div class="detail-label" style="margin-top:8px">菜單建議</div>
-      <div class="info-row"><span class="info-icon">🍲</span><span class="info-val">烤貝拼盤為主，另可加點鮑魚粥（長輩/幼童適合）、海鮮蔥煎餅</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/청사포+해림식당" target="_blank">🗺️ 海林家地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- BRONI 咖啡廳 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFF0D6">☕</div>
-      <div class="spot-main">
-        <div class="spot-time">午後</div>
-        <div class="spot-name">青沙浦海景咖啡廳 BRONI</div>
-        <div class="spot-name-full">BRONI 브로니 — 青沙浦海景咖啡廳</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-cafe">☕ 咖啡廳</span>
-          <span class="spot-tag tag-spot">🌊 海景</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🏠</span><span class="info-val">三層樓獨棟咖啡館＋頂樓，超廣角無敵海景</span></div>
-      <div class="info-row"><span class="info-icon">😴</span><span class="info-val">有懶骨頭座位區，可躺著看海休息</span></div>
-      <div class="info-row"><span class="info-icon">🍰</span><span class="info-val">必點：<strong>巴斯克乳酪蛋糕</strong></span></div>
-      <div class="info-row"><span class="info-icon">👴</span><span class="info-val">長輩在這裡喝咖啡看海最舒適</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/브로니+청사포" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 新世界百貨 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">🏬</div>
-      <div class="spot-main">
-        <div class="spot-time">下午</div>
-        <div class="spot-name">新世界百貨 Centum City</div>
-        <div class="spot-name-full">新世界百貨 Centum City — 逛街＋恐龍公園</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-shop">🛍️ 逛街</span>
-          <span class="spot-tag tag-rain">🌧️ 雨天OK</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">各樓層指南</div>
-      <div class="info-row"><span class="info-icon">🦕</span><span class="info-val"><strong>9F 恐龍公園</strong> — 頂樓露台，超逼真恐龍裝置，小孩必去！</span></div>
-      <div class="info-row"><span class="info-icon">👕</span><span class="info-val"><strong>B2</strong> 潮牌 / <strong>B1</strong> 美食＋伴手禮</span></div>
-      <div class="info-row"><span class="info-icon">💄</span><span class="info-val"><strong>1F</strong> 精品香水 / <strong>3–4F</strong> 女裝</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/신세계백화점+센텀시티" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 廣安里晚餐 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🌉</div>
-      <div class="spot-main">
-        <div class="spot-time">晚餐＋夜景</div>
-        <div class="spot-name">廣安里 — 晚餐 & 夜景</div>
-        <div class="spot-name-full">廣安里 — Musoe泡菜五花肉 + 廣安大橋夜景</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🥩 飲食</span>
-          <span class="spot-tag tag-spot">🌉 夜景</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🥩</span><span class="info-val"><strong>무쇠김치삼겹 / Musoe 泡菜五花肉</strong>（廣安店）</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 수영구 남천바다로33번길 27 1층</span></div>
-      <div class="info-row"><span class="info-icon">🌉</span><span class="info-val">飯後沿廣安里海邊散步賞廣安大橋夜景</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/무쇠김치삼겹+광안점" target="_blank">🗺️ 餐廳地圖</a>
-    </div>
-  </div>
-
 </div>
 
-
-<!-- ══════════════════════════════════
-     DAY 3
-══════════════════════════════════ -->
+<!-- ══ DAY 3 ══ -->
 <div class="day-content" id="day2">
-
   <div class="day-hero" style="background:linear-gradient(135deg,#FFCBBF,#C9B8E8);">
     <div class="day-hero-emoji">🚐</div>
     <div class="day-hero-title">DAY 3 · 包車一日遊</div>
     <div class="day-hero-sub">7月24日（五）｜換住：南浦洞飯店</div>
-    <div class="day-hero-tags">
-      <span class="hero-tag">🚐 全日包車</span>
-      <span class="hero-tag">🛷 斜坡滑車</span>
-      <span class="hero-tag">⛩️ 海東龍宮寺</span>
-      <span class="hero-tag">🏨 換飯店</span>
+    <div class="day-hero-tags"><span class="hero-tag">🚐 全日包車</span><span class="hero-tag">🛷 斜坡滑車</span><span class="hero-tag">⛩️ 海東龍宮寺</span></div>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView(2,'schedule')">📋 行程</button>
+    <button class="view-btn" onclick="switchView(2,'map')">🗺️ 地圖</button>
+  </div>
+  <div id="d2-schedule" class="view-pane active">
+    <div class="tips-box"><div class="tips-title">🚐 今日包車注意事項</div><div class="tips-item"><span>📦</span><span>今天 Check-out 海雲台，<strong>行李全部上車</strong></span></div><div class="tips-item"><span>👶</span><span>海東龍宮寺無法使用推車，2歲需背巾全程</span></div></div>
+    <div class="section-header"><div class="dot"></div><h3>📍 主要行程</h3><div class="section-divider"></div></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🍲</div><div class="spot-main"><div class="spot-time">07:00–08:00</div><div class="spot-name">早餐 — 大海鮑魚粥</div><div class="spot-name-full">大海鮑魚粥 바다마루전복죽</div><div class="spot-tags"><span class="spot-tag tag-food">🍚 早餐</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🕖</span><span class="info-val">07:00–14:30、16:00–20:00</span></div><div class="info-row"><span class="info-icon">🍲</span><span class="info-val">（小）₩13,000 /（大）₩18,000，長輩幼童都適合</span></div><a class="map-btn" href="https://map.kakao.com/link/search/바다마루전복죽+해운대" target="_blank">🗺️ Kakao Maps 導航</a></div>
     </div>
-  </div>
-
-  <div class="tips-box">
-    <div class="tips-title">🚐 今日包車行程 — 注意事項</div>
-    <div class="tips-item"><span>📦</span><span>今天 Check-out 海雲台飯店，<strong>行李全部上車</strong>，包車幫你帶到南浦洞新飯店</span></div>
-    <div class="tips-item"><span>🧳</span><span>大行李含推車最多 12 件，出發前確認行李數量</span></div>
-    <div class="tips-item"><span>👶</span><span>海東龍宮寺全程無法使用推車，2 歲幼童需全程用背巾或輪流抱</span></div>
-  </div>
-
-  <div class="section-header">
-    <div class="dot"></div>
-    <h3>📍 主要行程</h3>
-    <div class="section-divider"></div>
-  </div>
-
-  <!-- 早餐鮑魚粥 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🍲</div>
-      <div class="spot-main">
-        <div class="spot-time">07:00–08:00</div>
-        <div class="spot-name">早餐 — 大海鮑魚粥</div>
-        <div class="spot-name-full">大海鮑魚粥 바다마루전복죽（海雲台/尾浦站附近）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍚 早餐</span>
-        </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🛷</div><div class="spot-main"><div class="spot-time">09:00–11:00</div><div class="spot-name">Skyline Luge 斜坡滑車</div><div class="spot-name-full">Skyline Luge 釜山 — 斜坡滑車體驗</div><div class="spot-tags"><span class="spot-tag tag-spot">🎢 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🕙</span><span class="info-val">平日 10:00–19:00</span></div><div class="info-row"><span class="info-icon">🎢</span><span class="info-val">建議 3–4 趟，早去人少</span></div><div class="alert-box"><div class="alert-title">⚠️ 限制</div><div class="alert-text">2歲幼童完全無法乘坐，需大人留下陪伴</div></div><a class="map-btn" href="https://map.kakao.com/link/search/스카이라인루지+부산" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🍱</div><div class="spot-main"><div class="spot-time">11:15（約）</div><div class="spot-name">午餐 — 多鍋美食店 松亭店</div><div class="spot-name-full">다솥맛집 多鍋美食店 松亭店</div><div class="spot-tags"><span class="spot-tag tag-food">🍚 午餐</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 해운대구 송정광어골로 29 6층</span></div><div class="info-row"><span class="info-icon">🍚</span><span class="info-val">鮑魚釜飯為主，約 NT$600/人</span></div><a class="map-btn" href="https://map.kakao.com/link/search/다솥맛집+송정" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFF0D6">☕</div><div class="spot-main"><div class="spot-time">下午</div><div class="spot-name">機張海景咖啡廳 CORALANI</div><div class="spot-name-full">CORALANI 코랄라니 — 機張超人氣海景咖啡廳</div><div class="spot-tags"><span class="spot-tag tag-cafe">☕ 咖啡廳</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 기장군 기장읍 기장해안로 32</span></div><div class="info-row"><span class="info-icon">🌊</span><span class="info-val">直接蓋在海岸邊，建築本身就是打卡點</span></div><a class="map-btn" href="https://map.kakao.com/link/search/코랄라니+기장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">⛩️</div><div class="spot-main"><div class="spot-time">下午</div><div class="spot-name">海東龍宮寺</div><div class="spot-name-full">海東龍宮寺 — 韓國唯一依海而建佛寺</div><div class="spot-tags"><span class="spot-tag tag-spot">⛩️ 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="alert-box"><div class="alert-title">⚠️ 帶小孩必看</div><div class="alert-text">108階梯+石子路，推車完全無法使用，2歲需全程抱</div></div><a class="map-btn" href="https://map.kakao.com/link/search/해동용궁사" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🛍️</div><div class="spot-main"><div class="spot-time">傍晚</div><div class="spot-name">國際市場 + BIFF廣場小吃</div><div class="spot-name-full">國際市場買棉被 + BIFF廣場小吃</div><div class="spot-tags"><span class="spot-tag tag-shop">🛍️ 購物</span><span class="spot-tag tag-food">🍡 小吃</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🍡</span><span class="info-val">BIFF 廣場：必吃南瓜仔餅糖、蜂蜜糖餅</span></div><a class="map-btn" href="https://map.kakao.com/link/search/국제시장+부산" target="_blank">🗺️ 國際市場地圖</a></div>
+    </div>
+    <div class="section-header" style="margin-top:22px"><div class="dot" style="background:var(--lavender)"></div><h3>🗺️ 沿途備選景點</h3><div class="section-divider"></div></div>
+    <div class="optional-section">
+      <div class="optional-label">🔵 包車途中可彈性加入</div>
+      <div class="spot-card" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🏖️</div><div class="spot-main"><div class="spot-time">滑車後順道</div><div class="spot-name">松亭海水浴場</div><div class="spot-tags"><span class="spot-tag tag-spot">🌊 散步</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌊</span><span class="info-val">滑車結束後步行可達，比海雲台安靜許多</span></div><a class="map-btn" href="https://map.kakao.com/link/search/송정해수욕장" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🕖</span><span class="info-val">07:00–14:30、16:00–20:00</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">釜山尾浦站附近</span></div>
-      <div class="info-row"><span class="info-icon">🍲</span><span class="info-val">鮑魚粥（小）₩13,000 /（大）₩18,000</span></div>
-      <div class="info-row"><span class="info-icon">💚</span><span class="info-val">粥裡的綠色是鮑魚內臟燉出來的顏色，無腥味，非常新鮮！</span></div>
-      <div class="info-row"><span class="info-icon">👴</span><span class="info-val">清淡粥品，長輩、幼童都很適合</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/바다마루전복죽+해운대" target="_blank">🗺️ Kakao Maps 導航</a>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">⛪</div><div class="spot-main"><div class="spot-time">機張途中</div><div class="spot-name">竹城天主堂（夢幻海邊小教堂）</div><div class="spot-tags"><span class="spot-tag tag-spot">📸 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">📸</span><span class="info-val">機張海邊的夢幻小教堂，拍照超美，可順路停留</span></div><a class="map-btn" href="https://map.kakao.com/link/search/죽성드림성당+기장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🌿</div><div class="spot-main"><div class="spot-time">南浦洞</div><div class="spot-name">龍頭山公園＋釜山塔</div><div class="spot-tags"><span class="spot-tag tag-spot">🌿 景點</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌿</span><span class="info-val">南浦洞免費公園，有釜山塔，老人小孩都適合</span></div><a class="map-btn" href="https://map.kakao.com/link/search/용두산공원" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🐟</div><div class="spot-main"><div class="spot-time">南浦洞</div><div class="spot-name">札嘎其市場（釜山最大海鮮市場）</div><div class="spot-tags"><span class="spot-tag tag-food">🐟 海鮮</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🐟</span><span class="info-val">釜山最大海鮮市場，就在國際市場旁</span></div><a class="map-btn" href="https://map.kakao.com/link/search/자갈치시장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🪜</div><div class="spot-main"><div class="spot-time">南浦洞</div><div class="spot-name">四十階梯文化主題街</div><div class="spot-tags"><span class="spot-tag tag-spot">🏛️ 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🏛️</span><span class="info-val">歷史感濃厚，鄰近國際市場步行可達</span></div><a class="map-btn" href="https://map.kakao.com/link/search/40계단+문화관광테마거리" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
     </div>
   </div>
-  <div class="connector-line"></div>
-
-  <!-- 出發 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D6EEFA">🚐</div>
-      <div class="spot-main">
-        <div class="spot-time">08:50 出發</div>
-        <div class="spot-name">海雲台飯店 Check-out → 包車出發</div>
-        <div class="spot-name-full">海雲台飯店 Check-out，行李全上包車出發</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-transport">🚐 包車</span>
-          <span class="spot-tag tag-hotel">🏨 退房</span>
-        </div>
+  <div id="d2-map" class="view-pane">
+    <div class="map-container">
+      <div class="map-header">🗺️ DAY 3 · 松亭→機張→南浦洞（包車）</div>
+      <div id="map2"></div>
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#FF6B6B"></div>飲食</div>
+        <div class="leg"><div class="leg-dot" style="background:#4ECDC4"></div>景點</div>
+        <div class="leg"><div class="leg-dot" style="background:#F39C12"></div>購物</div>
+        <div class="leg"><div class="leg-ring" style="border-color:#4ECDC4"></div>備案</div>
       </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🧳</span><span class="info-val">全部行李上車，包車直接帶著跑一整天</span></div>
-      <div class="info-row"><span class="info-icon">📋</span><span class="info-val">退房前確認房間有無遺落物品</span></div>
+      <div class="map-tip">DAY3 移動距離最遠，可縮放地圖查看全程動線</div>
     </div>
   </div>
-  <div class="connector-line"></div>
-
-  <!-- Skyline Luge -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🛷</div>
-      <div class="spot-main">
-        <div class="spot-time">09:00–11:00（建議）</div>
-        <div class="spot-name">Skyline Luge 斜坡滑車</div>
-        <div class="spot-name-full">Skyline Luge 釜山 — 斜坡滑車體驗</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🎢 景點</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🕙</span><span class="info-val">平日 10:00–19:00（最後入場 18:00）</span></div>
-      <div class="info-row"><span class="info-icon">⭐</span><span class="info-val">為何要第一站？剛開園人最少、天氣最涼、小孩體力最好</span></div>
-      <div class="info-row"><span class="info-icon">🎢</span><span class="info-val">建議 3–4 趟就好，不要買太多，小孩玩完會很累</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 年齡身高限制</div>
-        <div class="alert-text">• <strong>2 歲幼童 ❌ 完全無法搭乘</strong>（需滿 85cm 且能站立）<br>• 7 歲大童（85–110cm）可大人陪同共乘<br>• 玩滑車時需 1–2 位大人留在下方照顧 2 歲寶寶<br>• 旺季排隊可能 40–60 分鐘，早去避開</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/스카이라인루지+부산" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 午餐多鍋 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🍱</div>
-      <div class="spot-main">
-        <div class="spot-time">11:15（約）</div>
-        <div class="spot-name">午餐 — 多鍋美食店 松亭店</div>
-        <div class="spot-name-full">다솥맛집 多鍋美食店 松亭店</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍚 午餐</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 해운대구 송정광어골로 29 화이트듀 빌딩 6층</span></div>
-      <div class="info-row"><span class="info-icon">🍚</span><span class="info-val">鮑魚釜飯為主，另有煎餅，約 NT$600/人</span></div>
-      <div class="info-row"><span class="info-icon">❄️</span><span class="info-val">有冷氣，可好好休息，8 人容易坐在一起</span></div>
-      <div class="info-row"><span class="info-icon">⏰</span><span class="info-val">11:15 用餐剛好錯開午餐尖峰，不用等位</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/다솥맛집+송정" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 機張咖啡廳 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFF0D6">☕</div>
-      <div class="spot-main">
-        <div class="spot-time">下午</div>
-        <div class="spot-name">機張海景咖啡廳 CORALANI</div>
-        <div class="spot-name-full">CORALANI 코랄라니 — 機張超人氣海景咖啡廳</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-cafe">☕ 咖啡廳</span>
-          <span class="spot-tag tag-spot">🌊 海景</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산 기장군 기장읍 기장해안로 32</span></div>
-      <div class="info-row"><span class="info-icon">🏗️</span><span class="info-val">直接蓋在海岸邊的超大型海景咖啡廳，建築本身就是打卡點</span></div>
-      <div class="info-row"><span class="info-icon">🌊</span><span class="info-val">有考慮防颱防浪設計，景觀超震撼</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/코랄라니+기장" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 海東龍宮寺 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">⛩️</div>
-      <div class="spot-main">
-        <div class="spot-time">下午</div>
-        <div class="spot-name">海東龍宮寺</div>
-        <div class="spot-name-full">海東龍宮寺 — 韓國唯一依海而建佛寺</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">⛩️ 景點</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">釜山機張郡，建於 1376 年</span></div>
-      <div class="info-row"><span class="info-icon">🌊</span><span class="info-val">韓國唯一依海而建的佛寺，海天一色景致壯麗</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 帶小孩必看</div>
-        <div class="alert-text">• 著名的「<strong>108 階</strong>」階梯，全程石子路與階梯<br>• 推車<strong>完全無法使用</strong>，2 歲小孩全程需背巾或輪流抱<br>• 長輩注意膝蓋，上下樓梯量力而為</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/해동용궁사" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 白淺灘 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">🎨</div>
-      <div class="spot-main">
-        <div class="spot-time">下午（可跳過）</div>
-        <div class="spot-name">白淺灘文化村</div>
-        <div class="spot-name-full">白淺灘文化村（體力許可再去）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🎨 景點</span>
-          <span class="spot-tag tag-optional">可跳過</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">💡</span><span class="info-val">今天行程很滿，若長輩或小孩體力不足，這站可跳過</span></div>
-      <div class="info-row"><span class="info-icon">🎨</span><span class="info-val">彩色壁畫村，拍照好看，但步行量不小</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/흰여울문화마을" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 國際市場 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🛍️</div>
-      <div class="spot-main">
-        <div class="spot-time">傍晚</div>
-        <div class="spot-name">國際市場 + BIFF廣場小吃</div>
-        <div class="spot-name-full">國際市場買棉被 + BIFF廣場 南瓜仔餅糖 / 蜂蜜糖餅</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-shop">🛍️ 購物</span>
-          <span class="spot-tag tag-food">🍡 小吃</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🛍️</span><span class="info-val">國際市場：購買棉被、各式韓國伴手禮</span></div>
-      <div class="info-row"><span class="info-icon">🍡</span><span class="info-val">BIFF 廣場：必吃南瓜仔餅糖、蜂蜜糖餅</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/국제시장+부산" target="_blank">🗺️ 國際市場地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 南浦洞 check in -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">🏨</div>
-      <div class="spot-main">
-        <div class="spot-time">傍晚</div>
-        <div class="spot-name">南浦洞飯店 Check-in</div>
-        <div class="spot-name-full">Good Ol'days Hotel 美好時光飯店 — Check-in</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-hotel">🏨 住宿</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🏨</span><span class="info-val"><strong>Good Ol'days Hotel（美好時光飯店）</strong> — 文青高質感</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">中央站 7 號出口</span></div>
-      <div class="info-row"><span class="info-icon">🚐</span><span class="info-val">包車直接送到飯店門口</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/Good+Ol+days+Hotel+부산" target="_blank">🗺️ 飯店地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 晚餐南浦洞 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🍽️</div>
-      <div class="spot-main">
-        <div class="spot-time">晚餐</div>
-        <div class="spot-name">晚餐 — 南浦洞商圈</div>
-        <div class="spot-name-full">南浦洞商圈晚餐 — 光復路 / 國際市場周邊</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍽️ 飲食</span>
-          <span class="spot-tag tag-shop">🛍️ 逛街</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">光復路時尚街、國際市場、BIFF廣場、樂天百貨（光復店）</span></div>
-      <div class="info-row"><span class="info-icon">🛍️</span><span class="info-val">邊吃邊逛，非常便利</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/남포동+광복로" target="_blank">🗺️ 光復路地圖</a>
-    </div>
-  </div>
-
 </div>
 
-
-<!-- ══════════════════════════════════
-     DAY 4
-══════════════════════════════════ -->
+<!-- ══ DAY 4 ══ -->
 <div class="day-content" id="day3">
-
   <div class="day-hero" style="background:linear-gradient(135deg,#D4F0DF,#D6EEFA);">
     <div class="day-hero-emoji">🎨</div>
     <div class="day-hero-title">DAY 4 · 文化村 → 影島</div>
     <div class="day-hero-sub">7月25日（六）｜住：南浦洞飯店</div>
-    <div class="day-hero-tags">
-      <span class="hero-tag">🎨 甘川洞</span>
-      <span class="hero-tag">🚡 松島纜車</span>
-      <span class="hero-tag">🖼️ Arte Museum</span>
+    <div class="day-hero-tags"><span class="hero-tag">🎨 甘川洞</span><span class="hero-tag">🚡 松島纜車</span><span class="hero-tag">🖼️ Arte Museum</span></div>
+  </div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView(3,'schedule')">📋 行程</button>
+    <button class="view-btn" onclick="switchView(3,'map')">🗺️ 地圖</button>
+  </div>
+  <div id="d3-schedule" class="view-pane active">
+    <div class="section-header"><div class="dot"></div><h3>📍 主要行程</h3><div class="section-divider"></div></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🥚</div><div class="spot-main"><div class="spot-time">08:00 起</div><div class="spot-name">早餐 — EGG DROP 南浦洞店</div><div class="spot-tags"><span class="spot-tag tag-food">🥚 早餐</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📍</span><span class="info-val">飯店步行 400m，光復路上</span></div><div class="alert-box"><div class="alert-title">⏰ 提醒</div><div class="alert-text">09:00–11:00 尖峰可能等 30–60 分鐘，建議 08:00 早點去</div></div><a class="map-btn" href="https://map.kakao.com/link/search/에그드랍+남포동" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">🤴</div><div class="spot-main"><div class="spot-time">上午</div><div class="spot-name">甘川洞文化村（小王子）</div><div class="spot-tags"><span class="spot-tag tag-spot">🎨 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📋</span><span class="info-val" style="font-size:14px;font-weight:700">부산 사하구 감천동 10-13</span></div><div class="alert-box"><div class="alert-title">⚠️ 注意</div><div class="alert-text">全區陡坡階梯，推車無用。長輩可在入口咖啡廳等候。</div></div><a class="map-btn" href="https://map.kakao.com/link/search/감천문화마을" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D6EEFA">🚡</div><div class="spot-main"><div class="spot-time">下午</div><div class="spot-name">松島纜車（韓國最長跨海纜車）</div><div class="spot-tags"><span class="spot-tag tag-spot">🚡 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">💎</span><span class="info-val">水晶車廂（玻璃地板）：成人往返 ₩22,000</span></div><div class="info-row"><span class="info-icon">🌉</span><span class="info-val">松島天空步道（免費）＋龍宮雲橋（₩1,000–2,000）</span></div><a class="map-btn" href="https://map.kakao.com/link/search/송도해상케이블카" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">🖼️</div><div class="spot-main"><div class="spot-time">下午（計程車約 15 分鐘）</div><div class="spot-name">Arte Museum 釜山（影島）</div><div class="spot-tags"><span class="spot-tag tag-spot">🎨 景點</span><span class="spot-tag tag-rain">🌧️ 雨天OK</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🕙</span><span class="info-val">每日 10:00–20:00，最後入場 19:00</span></div><div class="info-row"><span class="info-icon">⏱️</span><span class="info-val">建議預留 90–120 分鐘</span></div><a class="map-btn" href="https://map.kakao.com/link/search/아르떼뮤지엄+부산" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFF0D6">🐰</div><div class="spot-main"><div class="spot-time">藝術展後</div><div class="spot-name">P.ARK CAFÉ（影島）</div><div class="spot-tags"><span class="spot-tag tag-cafe">☕ 咖啡廳</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">🐰</span><span class="info-val">Arte Museum 旁，1F 有 Miffy 周邊，4F 露天</span></div><a class="map-btn" href="https://map.kakao.com/link/search/P.ARK+CAFE+영도" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🍲</div><div class="spot-main"><div class="spot-time">晚餐</div><div class="spot-name">晚餐 — 南浦蔘雞湯</div><div class="spot-tags"><span class="spot-tag tag-food">🍲 飲食</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산광역시 중구 남포길 16</span></div><div class="info-row"><span class="info-icon">⏰</span><span class="info-val">正餐時間人多，建議提早去或先訂位</span></div><a class="map-btn" href="https://map.kakao.com/link/search/남포삼계탕" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="section-header" style="margin-top:22px"><div class="dot" style="background:var(--lavender)"></div><h3>🗺️ 甘川洞/松島/影島 — 彈性備選</h3><div class="section-divider"></div></div>
+    <div class="optional-section">
+      <div class="optional-label">🔵 依當天時間彈性加入</div>
+      <div class="spot-card" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🌊</div><div class="spot-main"><div class="spot-time">松島纜車後</div><div class="spot-name">松島海水浴場</div><div class="spot-tags"><span class="spot-tag tag-spot">🌊 散步</span><span class="spot-tag tag-optional">免費</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌊</span><span class="info-val">纜車後步行可達，老人休息好去處</span></div><a class="map-btn" href="https://map.kakao.com/link/search/송도해수욕장" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFCBBF">🌄</div><div class="spot-main"><div class="spot-time">影島</div><div class="spot-name">太宗台（影島最南端懸崖景觀）</div><div class="spot-tags"><span class="spot-tag tag-spot">🌄 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🌄</span><span class="info-val">影島最南端懸崖景觀，壯闊海景，包車可直達</span></div><a class="map-btn" href="https://map.kakao.com/link/search/태종대" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">🎨</div><div class="spot-main"><div class="spot-time">影島</div><div class="spot-name">白淺灘文化村</div><div class="spot-tags"><span class="spot-tag tag-spot">🎨 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🎨</span><span class="info-val">影島彩色小村，P.ARK 附近步行可達</span></div><a class="map-btn" href="https://map.kakao.com/link/search/흰여울문화마을" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
     </div>
   </div>
-
-  <div class="section-header">
-    <div class="dot"></div>
-    <h3>📍 主要行程</h3>
-    <div class="section-divider"></div>
-  </div>
-
-  <!-- 早餐 EGG DROP -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🥚</div>
-      <div class="spot-main">
-        <div class="spot-time">08:00 起</div>
-        <div class="spot-name">早餐 — EGG DROP 南浦洞店</div>
-        <div class="spot-name-full">EGG DROP 南浦洞店 — 早餐</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🥚 早餐</span>
-        </div>
+  <div id="d3-map" class="view-pane">
+    <div class="map-container">
+      <div class="map-header">🗺️ DAY 4 · 甘川洞→松島→影島</div>
+      <div id="map3"></div>
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#FF6B6B"></div>飲食</div>
+        <div class="leg"><div class="leg-dot" style="background:#4ECDC4"></div>景點</div>
+        <div class="leg"><div class="leg-dot" style="background:#9B6EC4"></div>咖啡廳</div>
+        <div class="leg"><div class="leg-ring" style="border-color:#4ECDC4"></div>備案</div>
       </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🕗</span><span class="info-val">每日 08:00–21:00</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">飯店步行 400m，約 5 分鐘，光復路上地鐵南浦站 1 號出口旁</span></div>
-      <div class="info-row"><span class="info-icon">🏠</span><span class="info-val">2 層樓寬敞空間，8 人座位沒問題</span></div>
-      <div class="info-row"><span class="info-icon">🛺</span><span class="info-val">推車友善，走過去不費力</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⏰ 排隊提醒</div>
-        <div class="alert-text">南浦洞觀光大一級戰區，09:00–11:00 尖峰可能等 30–60 分鐘。建議 <strong>08:00–08:30 早點去</strong>，避開人潮。</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/에그드랍+남포동" target="_blank">🗺️ Kakao Maps 導航</a>
+      <div class="map-tip">實心圓=主行程　空心圓=備案　點標記看詳情</div>
     </div>
   </div>
-  <div class="connector-line"></div>
-
-  <!-- 甘川洞 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">🤴</div>
-      <div class="spot-main">
-        <div class="spot-time">上午</div>
-        <div class="spot-name">甘川洞文化村（小王子）</div>
-        <div class="spot-name-full">甘川洞文化村 — 小王子打卡聖地</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🎨 景點</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">計程車韓文地址（直接給司機看）</div>
-      <div class="info-row"><span class="info-icon">📋</span><span class="info-val" style="font-size:14px;font-weight:700;color:var(--text-dark)">부산 사하구 감천동 10-13</span></div>
-      <div class="info-row"><span class="info-icon">🤴</span><span class="info-val">小王子拍照點：排隊輪流拍，工作人員指揮，<strong>要快狠準</strong>，不能拍太久</span></div>
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 長輩/推車注意</div>
-        <div class="alert-text">• 全區<strong>陡坡和階梯</strong>，推車無用武之地<br>• 長輩可在入口咖啡廳等候休息，年輕人帶小孩進去<br>• 2 歲幼童需大人抱著走全程</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/감천문화마을" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 松島纜車 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D6EEFA">🚡</div>
-      <div class="spot-main">
-        <div class="spot-time">下午</div>
-        <div class="spot-name">松島纜車（韓國最長跨海纜車）</div>
-        <div class="spot-name-full">釜山松島纜車 — 韓國最長跨海纜車</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🚡 景點</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="detail-label">票種（可 8 人同乘）</div>
-      <div class="info-row"><span class="info-icon">🎫</span><span class="info-val"><strong>一般車廂</strong>：成人往返 ₩17,000 / 兒童往返 ₩12,000</span></div>
-      <div class="info-row"><span class="info-icon">💎</span><span class="info-val"><strong>水晶車廂</strong>（玻璃地板）：成人往返 ₩22,000 / 兒童往返 ₩16,000</span></div>
-      <div class="info-row"><span class="info-icon">🎟️</span><span class="info-val">當天購票即可 / 也可 KKday、KLOOK 預約</span></div>
-      <div class="detail-label" style="margin-top:8px">周邊免費景點</div>
-      <div class="info-row"><span class="info-icon">🌉</span><span class="info-val">松島天空步道（免費）</span></div>
-      <div class="info-row"><span class="info-icon">🌉</span><span class="info-val">松島龍宮雲橋（成人約 ₩1,000–2,000）09:00–18:00</span></div>
-      <div class="alert-box">
-        <div class="alert-title">🛺 推車提醒</div>
-        <div class="alert-text">大推車無法推上普通纜車，建議寄放在售票處，或使用輕便折疊推車。</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/송도해상케이블카" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 午餐 海底貝殼王國 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🦀</div>
-      <div class="spot-main">
-        <div class="spot-time">午餐</div>
-        <div class="spot-name">午餐 — 海底貝殼王國</div>
-        <div class="spot-name-full">海底貝殼王國 바닷속조개왕국（松島纜車站附近）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🦪 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">松島纜車站附近，烤貝專門店</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/바닷속조개왕국+송도" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- Arte Museum -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">🖼️</div>
-      <div class="spot-main">
-        <div class="spot-time">下午（計程車約 15 分鐘）</div>
-        <div class="spot-name">Arte Museum 釜山（影島）</div>
-        <div class="spot-name-full">Arte Museum 釜山 — 全球最大沈浸藝術展</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-spot">🎨 景點</span>
-          <span class="spot-tag tag-rain">🌧️ 雨天OK</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">釜山影島（從松島計程車約 15 分鐘）</span></div>
-      <div class="info-row"><span class="info-icon">🕙</span><span class="info-val">每日 10:00–20:00，最後入場 19:00</span></div>
-      <div class="info-row"><span class="info-icon">⭐</span><span class="info-val">目前全球最大沈浸藝術展，聲光影音震撼體驗</span></div>
-      <div class="info-row"><span class="info-icon">⏱️</span><span class="info-val">建議預留 90–120 分鐘</span></div>
-      <div class="alert-box">
-        <div class="alert-title">🛺 展館內提醒</div>
-        <div class="alert-text">燈光昏暗、部分地面為鏡面或軟墊，推推車需格外小心。建議利用免費寄物櫃寄放推車。</div>
-      </div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/아르떼뮤지엄+부산" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- P.ARK Cafe -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFF0D6">🐰</div>
-      <div class="spot-main">
-        <div class="spot-time">藝術展後（影島）</div>
-        <div class="spot-name">P.ARK CAFÉ & Bakery（影島）</div>
-        <div class="spot-name-full">P.ARK CAFÉ & Bakery — Arte Museum 旁複合咖啡廳</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-cafe">☕ 咖啡廳</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">Arte Museum 旁，2–4 樓咖啡廳，4 樓有露天座位</span></div>
-      <div class="info-row"><span class="info-icon">🐰</span><span class="info-val">1 樓有 Miffy 周邊，小孩超愛</span></div>
-      <div class="info-row"><span class="info-icon">🚕</span><span class="info-val">逛完後前往南浦洞市區，車程約 15–20 分鐘</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/P.ARK+CAFE+영도" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 晚餐蔘雞湯 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🍲</div>
-      <div class="spot-main">
-        <div class="spot-time">晚餐</div>
-        <div class="spot-name">晚餐 — 南浦蔘雞湯</div>
-        <div class="spot-name-full">南浦蔘雞湯 남포삼계탕</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍲 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">부산광역시 중구 남포길 16</span></div>
-      <div class="info-row"><span class="info-icon">👴</span><span class="info-val">在地人和觀光客都愛，蔘雞湯滋補，長輩非常適合</span></div>
-      <div class="info-row"><span class="info-icon">⏰</span><span class="info-val">正餐時間人多，建議提早去或先訂位</span></div>
-      <div class="detail-label" style="margin-top:8px">飯後逛街</div>
-      <div class="info-row"><span class="info-icon">🛍️</span><span class="info-val">光復路 / 樂天百貨（光復店）買伴手禮</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/남포삼계탕" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-
 </div>
 
-
-<!-- ══════════════════════════════════
-     DAY 5
-══════════════════════════════════ -->
+<!-- ══ DAY 5 ══ -->
 <div class="day-content" id="day4">
-
   <div class="day-hero" style="background:linear-gradient(135deg,#FFE4B0,#D4F0DF);">
     <div class="day-hero-emoji">🏠</div>
     <div class="day-hero-title">DAY 5 · 西面 → 返台</div>
     <div class="day-hero-sub">7月26日（日）｜✈️ 20:00 釜山出發</div>
-    <div class="day-hero-tags">
-      <span class="hero-tag">💆 西面醫美</span>
-      <span class="hero-tag">☕ 田浦咖啡街</span>
-      <span class="hero-tag">✈️ 20:00 返台</span>
-    </div>
+    <div class="day-hero-tags"><span class="hero-tag">💆 西面醫美</span><span class="hero-tag">☕ 田浦咖啡街</span><span class="hero-tag">✈️ 20:00 返台</span></div>
   </div>
-
-  <!-- 返程航班 -->
-  <div class="flight-card">
-    <div class="flight-row">
-      <div class="flight-city">
-        <div class="city-code">PUS</div>
-        <div class="city-name">釜山金海</div>
-        <div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">20:00</div>
+  <div class="view-toggle">
+    <button class="view-btn active" onclick="switchView(4,'schedule')">📋 行程</button>
+    <button class="view-btn" onclick="switchView(4,'map')">🗺️ 地圖</button>
+  </div>
+  <div id="d4-schedule" class="view-pane active">
+    <div class="flight-card">
+      <div class="flight-row">
+        <div class="flight-city"><div class="city-code">PUS</div><div class="city-name">釜山金海</div><div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">20:00</div></div>
+        <div class="flight-center"><div class="plane">✈️</div><div class="duration">2h 20m</div><div style="font-size:10px;color:var(--text-light)">────────</div></div>
+        <div class="flight-city"><div class="city-code">TPE</div><div class="city-name">台北桃園</div><div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">21:20</div></div>
       </div>
-      <div class="flight-center">
-        <div class="plane">✈️</div>
-        <div class="duration">2h 20m</div>
-        <div style="font-size:10px;color:var(--text-light)">────────</div>
-      </div>
-      <div class="flight-city">
-        <div class="city-code">TPE</div>
-        <div class="city-name">台北桃園</div>
-        <div style="font-size:16px;font-weight:700;color:var(--coral);margin-top:2px">21:20</div>
-      </div>
+      <div class="flight-info"><div class="fi-item"><strong>航班</strong>CI 187</div><div class="fi-item"><strong>航空</strong>中華航空</div><div class="fi-item"><strong>送機</strong>包車</div></div>
     </div>
-    <div class="flight-info">
-      <div class="fi-item"><strong>航班</strong>CI 187</div>
-      <div class="fi-item"><strong>航空</strong>中華航空</div>
-      <div class="fi-item"><strong>送機</strong>包車</div>
-    </div>
-  </div>
-
-  <div class="tips-box">
-    <div class="tips-title">⏰ 今日時間規劃提醒</div>
-    <div class="tips-item"><span>✈️</span><span>20:00 起飛，建議 <strong>17:30 前抵達機場</strong>（帶老人小孩要預留充裕時間）</span></div>
-    <div class="tips-item"><span>🏨</span><span>退房寄行李後，輕裝出發，<strong>16:00 前要回飯店領行李</strong></span></div>
-    <div class="tips-item"><span>☕</span><span>田浦咖啡街多數 <strong>11:00 後</strong>才開，早上別去，安排在下午</span></div>
-  </div>
-
-  <div class="section-header">
-    <div class="dot"></div>
-    <h3>📍 主要行程</h3>
-    <div class="section-divider"></div>
-  </div>
-
-  <!-- 早餐 EGG DROP -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🥚</div>
-      <div class="spot-main">
-        <div class="spot-time">08:00</div>
-        <div class="spot-name">早餐 — EGG DROP 南浦洞店</div>
-        <div class="spot-name-full">EGG DROP 南浦洞店（同 DAY 4）</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🥚 早餐</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">飯店步行 400m，光復路上</span></div>
-      <div class="info-row"><span class="info-icon">⏰</span><span class="info-val">早點去避開人潮，今天行程較緊，不能等太久</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/에그드랍+남포동" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 退房寄行李 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D6EEFA">🧳</div>
-      <div class="spot-main">
-        <div class="spot-time">～ 10:00</div>
-        <div class="spot-name">退房 & 寄放行李</div>
-        <div class="spot-name-full">飯店退房 & 行李寄放</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-hotel">🏨 退房</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🧳</span><span class="info-val">Check-out 後行李寄放在飯店前台，輕裝出發</span></div>
-      <div class="info-row"><span class="info-icon">🛺</span><span class="info-val">推車也可暫時寄放，今天行程不需要</span></div>
-      <div class="info-row"><span class="info-icon">⏰</span><span class="info-val"><strong>記得 16:00 前回來領行李！</strong></span></div>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 西面 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#EDE5F8">💆</div>
-      <div class="spot-main">
-        <div class="spot-time">上午</div>
-        <div class="spot-name">西面醫美 + 西面商圈逛街</div>
-        <div class="spot-name-full">西面醫美諮詢 + 西面商圈逛街購物</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-shop">💆 醫美</span>
-          <span class="spot-tag tag-shop">🛍️ 逛街</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">💆</span><span class="info-val">釜山西面醫美診所聚集，諮詢/療程按需求安排</span></div>
-      <div class="info-row"><span class="info-icon">🛍️</span><span class="info-val">西面是釜山年輕人購物聚集地，地鐵直達</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/서면+부산" target="_blank">🗺️ 西面地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 西面午餐 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFE4B0">🍕</div>
-      <div class="spot-main">
-        <div class="spot-time">午餐</div>
-        <div class="spot-name">午餐 — 李在模的披薩（西面）</div>
-        <div class="spot-name-full">李在模的披薩 — 釜山&濟州限定名店</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-food">🍕 飲食</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">⭐</span><span class="info-val">只開在釜山和濟州島，釜山限定必吃</span></div>
-      <div class="info-row"><span class="info-icon">📱</span><span class="info-val"><strong>記得用 App 提前預約訂位</strong>，免現場久等</span></div>
-      <div class="info-row"><span class="info-icon">📍</span><span class="info-val">西面分店（另有南浦洞光復路總店、釜山站分店）</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/이재모피자+서면" target="_blank">🗺️ Kakao Maps 導航</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 田浦咖啡街 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#FFF0D6">☕</div>
-      <div class="spot-main">
-        <div class="spot-time">12:00 後（重要！）</div>
-        <div class="spot-name">田浦咖啡街</div>
-        <div class="spot-name-full">田浦咖啡街 — 12:00 後才開門</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-cafe">☕ 咖啡廳</span>
-          <span class="spot-tag tag-shop">🛍️ 文創</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="alert-box">
-        <div class="alert-title">⚠️ 重要！開門時間</div>
-        <div class="alert-text">田浦一帶幾乎所有店家都是 <strong>11:00–12:00 後才開</strong>！早上去會撲空，請安排在下午。</div>
-      </div>
-      <div class="detail-label" style="margin-top:8px">推薦店家</div>
-      <div class="info-row"><span class="info-icon">☕</span><span class="info-val"><strong>OFF COURSE Bakery Café</strong></span></div>
-      <div class="info-row"><span class="info-icon">🪴</span><span class="info-val"><strong>Beuraket</strong> — 裝飾小物、文創選物</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/전포카페거리" target="_blank">🗺️ 田浦咖啡街地圖</a>
-    </div>
-  </div>
-  <div class="connector-line"></div>
-
-  <!-- 領行李前往機場 -->
-  <div class="spot-card" onclick="toggleCard(this)">
-    <div class="spot-card-header">
-      <div class="spot-icon" style="background:#D4F0DF">🛫</div>
-      <div class="spot-main">
-        <div class="spot-time">16:00 回飯店 → 17:30 機場</div>
-        <div class="spot-name">領行李 → 前往金海機場</div>
-        <div class="spot-name-full">回飯店領行李 → 包車送機 → 金海機場</div>
-        <div class="spot-tags">
-          <span class="spot-tag tag-transport">🚐 包車</span>
-          <span class="spot-tag tag-transport">✈️ 返台</span>
-        </div>
-      </div>
-      <div class="spot-arrow">⌄</div>
-    </div>
-    <div class="spot-detail">
-      <div class="info-row"><span class="info-icon">🏨</span><span class="info-val">16:00 回飯店領取寄放行李</span></div>
-      <div class="info-row"><span class="info-icon">🚐</span><span class="info-val">包車送機，司機安排好時間</span></div>
-      <div class="info-row"><span class="info-icon">⏰</span><span class="info-val">建議 <strong>17:30–17:45 抵達機場</strong>（帶老人小孩安全起見）</span></div>
-      <div class="info-row"><span class="info-icon">✈️</span><span class="info-val">CI 187 起飛 20:00，記得提前報到</span></div>
-      <a class="map-btn" href="https://map.kakao.com/link/search/김해국제공항" target="_blank">🗺️ 金海機場地圖</a>
-    </div>
-  </div>
-
-  <!-- 周邊備選 -->
-  <div class="section-header" style="margin-top:22px">
-    <div class="dot" style="background:var(--lavender)"></div>
-    <h3>🗺️ 西面/田浦周邊 — 彈性備選</h3>
-    <div class="section-divider"></div>
-  </div>
-  <div class="optional-section">
-    <div class="optional-label">🔵 時間充裕可考慮加入</div>
-
+    <div class="tips-box"><div class="tips-title">⏰ 今日時間提醒</div><div class="tips-item"><span>✈️</span><span>20:00 起飛，建議 <strong>17:30 前抵達機場</strong></span></div><div class="tips-item"><span>🏨</span><span><strong>16:00 前回飯店領行李</strong></span></div><div class="tips-item"><span>☕</span><span>田浦咖啡街 <strong>11:00 後</strong>才開，早上別去</span></div></div>
+    <div class="section-header"><div class="dot"></div><h3>📍 主要行程</h3><div class="section-divider"></div></div>
     <div class="spot-card" onclick="toggleCard(this)">
-      <div class="spot-card-header">
-        <div class="spot-icon" style="background:#FFE0E0">💊</div>
-        <div class="spot-main">
-          <div class="spot-time">任意</div>
-          <div class="spot-name">Olive Young 西面店</div>
-          <div class="spot-name-full">Olive Young — 韓國最大藥妝連鎖</div>
-          <div class="spot-tags">
-            <span class="spot-tag tag-shop">💄 購物</span>
-          </div>
-        </div>
-        <div class="spot-arrow">⌄</div>
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🥚</div><div class="spot-main"><div class="spot-time">08:00</div><div class="spot-name">早餐 — EGG DROP 南浦洞店</div><div class="spot-tags"><span class="spot-tag tag-food">🥚 早餐</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">⏰</span><span class="info-val">今天行程較緊，早點去避開人潮</span></div><a class="map-btn" href="https://map.kakao.com/link/search/에그드랍+남포동" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#EDE5F8">💆</div><div class="spot-main"><div class="spot-time">上午</div><div class="spot-name">西面醫美 + 西面商圈逛街</div><div class="spot-tags"><span class="spot-tag tag-shop">💆 醫美</span><span class="spot-tag tag-shop">🛍️ 逛街</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">💆</span><span class="info-val">釜山西面醫美診所聚集，地鐵直達</span></div><a class="map-btn" href="https://map.kakao.com/link/search/서면+부산" target="_blank">🗺️ 西面地圖</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🍕</div><div class="spot-main"><div class="spot-time">午餐</div><div class="spot-name">午餐 — 李在模的披薩（西面）</div><div class="spot-tags"><span class="spot-tag tag-food">🍕 飲食</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">⭐</span><span class="info-val">只開在釜山和濟州島，釜山限定必吃</span></div><div class="info-row"><span class="info-icon">📱</span><span class="info-val"><strong>記得用 App 提前預約訂位</strong></span></div><a class="map-btn" href="https://map.kakao.com/link/search/이재모피자+서면" target="_blank">🗺️ Kakao Maps 導航</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#FFF0D6">☕</div><div class="spot-main"><div class="spot-time">12:00 後（重要！）</div><div class="spot-name">田浦咖啡街</div><div class="spot-tags"><span class="spot-tag tag-cafe">☕ 咖啡廳</span><span class="spot-tag tag-shop">🛍️ 文創</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="alert-box"><div class="alert-title">⚠️ 開門時間</div><div class="alert-text">幾乎所有店家 11:00–12:00 後才開，早上去會撲空！</div></div><div class="info-row"><span class="info-icon">☕</span><span class="info-val"><strong>OFF COURSE Bakery Café</strong></span></div><div class="info-row"><span class="info-icon">🪴</span><span class="info-val"><strong>Beuraket</strong> — 裝飾小物文創選物</span></div><a class="map-btn" href="https://map.kakao.com/link/search/전포카페거리" target="_blank">🗺️ 田浦咖啡街地圖</a></div>
+    </div>
+    <div class="connector-line"></div>
+    <div class="spot-card" onclick="toggleCard(this)">
+      <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🛫</div><div class="spot-main"><div class="spot-time">16:00 → 17:30</div><div class="spot-name">領行李 → 前往金海機場</div><div class="spot-tags"><span class="spot-tag tag-transport">🚐 包車</span><span class="spot-tag tag-transport">✈️ 返台</span></div></div><div class="spot-arrow">⌄</div></div>
+      <div class="spot-detail"><div class="info-row"><span class="info-icon">⏰</span><span class="info-val">17:30–17:45 抵達機場（帶老人小孩預留充裕時間）</span></div><a class="map-btn" href="https://map.kakao.com/link/search/김해국제공항" target="_blank">🗺️ 金海機場地圖</a></div>
+    </div>
+    <div class="section-header" style="margin-top:22px"><div class="dot" style="background:var(--lavender)"></div><h3>🗺️ 西面/田浦 — 彈性備選</h3><div class="section-divider"></div></div>
+    <div class="optional-section">
+      <div class="optional-label">🔵 時間充裕可考慮加入</div>
+      <div class="spot-card" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFE0E0">💊</div><div class="spot-main"><div class="spot-time">西面</div><div class="spot-name">Olive Young 西面店</div><div class="spot-tags"><span class="spot-tag tag-shop">💄 購物</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">💄</span><span class="info-val">保養品、彩妝、零食伴手禮一次買齊</span></div><a class="map-btn" href="https://map.kakao.com/link/search/올리브영+서면" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
-      <div class="spot-detail">
-        <div class="info-row"><span class="info-icon">💄</span><span class="info-val">韓系保養品、彩妝、零食伴手禮一次買齊</span></div>
-        <a class="map-btn" href="https://map.kakao.com/link/search/올리브영+서면" target="_blank">🗺️ Kakao Maps 導航</a>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#D4F0DF">🏃</div><div class="spot-main"><div class="spot-time">西面</div><div class="spot-name">Running Man 體驗館</div><div class="spot-tags"><span class="spot-tag tag-spot">🎮 景點</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🎮</span><span class="info-val">西面附近，小孩超愛，約需 1.5 小時</span></div><a class="map-btn" href="https://map.kakao.com/link/search/런닝맨체험관+부산" target="_blank">🗺️ Kakao Maps 導航</a></div>
+      </div>
+      <div class="spot-card" style="margin-top:8px" onclick="toggleCard(this)">
+        <div class="spot-card-header"><div class="spot-icon" style="background:#FFE4B0">🍖</div><div class="spot-main"><div class="spot-time">西面</div><div class="spot-name">西面吃街 먹자골목</div><div class="spot-tags"><span class="spot-tag tag-food">🍖 小吃</span></div></div><div class="spot-arrow">⌄</div></div>
+        <div class="spot-detail"><div class="info-row"><span class="info-icon">🍖</span><span class="info-val">各種韓式小吃，價格親民，熱鬧好逛</span></div><a class="map-btn" href="https://map.kakao.com/link/search/서면먹자골목" target="_blank">🗺️ Kakao Maps 導航</a></div>
       </div>
     </div>
   </div>
-
+  <div id="d4-map" class="view-pane">
+    <div class="map-container">
+      <div class="map-header">🗺️ DAY 5 · 西面→田浦→機場</div>
+      <div id="map4"></div>
+      <div class="map-legend">
+        <div class="leg"><div class="leg-dot" style="background:#FF6B6B"></div>飲食</div>
+        <div class="leg"><div class="leg-dot" style="background:#4ECDC4"></div>景點</div>
+        <div class="leg"><div class="leg-dot" style="background:#9B6EC4"></div>咖啡廳</div>
+        <div class="leg"><div class="leg-ring" style="border-color:#FF6B6B"></div>備案</div>
+      </div>
+      <div class="map-tip">實心圓=主行程　空心圓=備案　點標記看詳情</div>
+    </div>
+  </div>
 </div>
-
 
 <!-- ══ BOTTOM NAV ══ -->
 <div class="bottom-nav">
-  <button class="nav-btn active" onclick="switchDay(0)" id="nav0">
-    <span class="nav-icon">✈️</span>7/22
-  </button>
-  <button class="nav-btn" onclick="switchDay(1)" id="nav1">
-    <span class="nav-icon">🚞</span>7/23
-  </button>
-  <button class="nav-btn" onclick="switchDay(2)" id="nav2">
-    <span class="nav-icon">🚐</span>7/24
-  </button>
-  <button class="nav-btn" onclick="switchDay(3)" id="nav3">
-    <span class="nav-icon">🎨</span>7/25
-  </button>
-  <button class="nav-btn" onclick="switchDay(4)" id="nav4">
-    <span class="nav-icon">🏠</span>7/26
-  </button>
+  <button class="nav-btn active" onclick="switchDay(0)" id="nav0"><span class="nav-icon">✈️</span>7/22</button>
+  <button class="nav-btn" onclick="switchDay(1)" id="nav1"><span class="nav-icon">🚞</span>7/23</button>
+  <button class="nav-btn" onclick="switchDay(2)" id="nav2"><span class="nav-icon">🚐</span>7/24</button>
+  <button class="nav-btn" onclick="switchDay(3)" id="nav3"><span class="nav-icon">🎨</span>7/25</button>
+  <button class="nav-btn" onclick="switchDay(4)" id="nav4"><span class="nav-icon">🏠</span>7/26</button>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.js"></script>
 <script>
-  function switchDay(index) {
-    document.querySelectorAll('.day-content').forEach((el, i) => {
-      el.classList.toggle('active', i === index);
-    });
-    document.querySelectorAll('.day-tab').forEach((el, i) => {
-      el.classList.toggle('active', i === index);
-    });
-    document.querySelectorAll('.nav-btn').forEach((el, i) => {
-      el.classList.toggle('active', i === index);
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+const MAPS_DATA = {
+  0: {
+    center:[35.163,129.163], zoom:14,
+    main:[
+      {n:"① 海雲台飯店",lat:35.1587,lng:129.1604,c:"#9B59B6",time:"11:15",note:"包車接機後直接前往 Check-in",k:"https://map.kakao.com/link/search/해운대+호텔"},
+      {n:"② 豬肉湯飯",lat:35.1601,lng:129.1628,c:"#FF6B6B",time:"午餐",note:"密陽/嚴湧帛/五福 擇一",k:"https://map.kakao.com/link/search/돼지국밥+해운대"},
+      {n:"③ Club D Oasis",lat:35.1635,lng:129.1658,c:"#4ECDC4",time:"下午擇一",note:"LCT大樓 4–6F｜⚠️4歲以上男女分開",k:"https://map.kakao.com/link/search/클럽디오아시스"},
+      {n:"④ BUSAN X the SKY",lat:35.1638,lng:129.1665,c:"#4ECDC4",time:"下午擇一",note:"LCT大樓 101F｜釜山全景｜雨天OK",k:"https://map.kakao.com/link/search/부산엑스더스카이"},
+      {n:"⑤ 晚餐烤肉/刀削麵",lat:35.1572,lng:129.1588,c:"#FF6B6B",time:"晚餐",note:"味贊王烤肉 或 31cm刀削麵",k:"https://map.kakao.com/link/search/미찬왕+해운대"},
+      {n:"⑥ 海雲台傳統市場",lat:35.1567,lng:129.1575,c:"#F39C12",time:"飯後散步",note:"09:00–22:00｜尚國家飯捲",k:"https://map.kakao.com/link/search/해운대전통시장"}
+    ],
+    alt:[
+      {n:"◎ SEA LIFE 水族館",lat:35.1580,lng:129.1610,c:"#4ECDC4",time:"雨天首選",note:"推車可入，小孩最愛",k:"https://map.kakao.com/link/search/씨라이프부산아쿠아리움"},
+      {n:"◎ 海雲台海水浴場",lat:35.1585,lng:129.1622,c:"#4ECDC4",time:"任意時間",note:"免費，傍晚最美",k:"https://map.kakao.com/link/search/해운대해수욕장"},
+      {n:"◎ 冬柏島",lat:35.1560,lng:129.1555,c:"#4ECDC4",time:"任意時間",note:"免費小島，30分鐘繞一圈",k:"https://map.kakao.com/link/search/동백섬+해운대"},
+      {n:"◎ Blueline Park步道",lat:35.1655,lng:129.1570,c:"#4ECDC4",time:"任意時間",note:"免費海岸步道",k:"https://map.kakao.com/link/search/블루라인파크+해운대"}
+    ]
+  },
+  1: {
+    center:[35.168,129.172], zoom:13,
+    main:[
+      {n:"① Working Holiday",lat:35.1626,lng:129.1618,c:"#FF6B6B",time:"08:00",note:"早餐，海雲台沙灘正對面",k:"https://map.kakao.com/link/search/킹홀리데이+해운대"},
+      {n:"② 膠囊/海岸列車",lat:35.1680,lng:129.1775,c:"#4ECDC4",time:"09:00",note:"尾浦站出發→青沙浦",k:"https://map.kakao.com/link/search/미포역+블루라인파크"},
+      {n:"③ 海林家烤貝",lat:35.1793,lng:129.2050,c:"#FF6B6B",time:"午餐",note:"30年老字號，8人最友善",k:"https://map.kakao.com/link/search/청사포+해림식당"},
+      {n:"④ BRONI 咖啡廳",lat:35.1795,lng:129.2058,c:"#F39C12",time:"午後",note:"必點巴斯克乳酪蛋糕",k:"https://map.kakao.com/link/search/브로니+청사포"},
+      {n:"⑤ 新世界百貨",lat:35.1697,lng:129.1309,c:"#4ECDC4",time:"下午",note:"9F 恐龍公園，小孩必去",k:"https://map.kakao.com/link/search/신세계백화점+센텀시티"},
+      {n:"⑥ Musoe五花肉晚餐",lat:35.1447,lng:129.1062,c:"#FF6B6B",time:"晚餐",note:"廣安大橋夜景",k:"https://map.kakao.com/link/search/무쇠김치삼겹+광안점"}
+    ],
+    alt:[
+      {n:"◎ Olive Young廣安",lat:35.1452,lng:129.1068,c:"#F39C12",time:"晚餐前",note:"保養品購物",k:"https://map.kakao.com/link/search/올리브영+광안리"},
+      {n:"◎ 民樂水邊公園",lat:35.1463,lng:129.1085,c:"#4ECDC4",time:"晚餐後",note:"廣安大橋夜景最佳拍攝點",k:"https://map.kakao.com/link/search/민락수변공원"},
+      {n:"◎ 廣安里水產市場",lat:35.1460,lng:129.1075,c:"#FF6B6B",time:"彈性",note:"新鮮海產現買現烤",k:"https://map.kakao.com/link/search/광안리수산시장"}
+    ]
+  },
+  2: {
+    center:[35.18,129.12], zoom:11,
+    main:[
+      {n:"① 大海鮑魚粥",lat:35.1677,lng:129.1764,c:"#FF6B6B",time:"07:00",note:"清淡，長輩幼童都適合",k:"https://map.kakao.com/link/search/바다마루전복죽+해운대"},
+      {n:"② Skyline Luge",lat:35.1814,lng:129.2196,c:"#4ECDC4",time:"09:00",note:"⚠️2歲不可乘坐",k:"https://map.kakao.com/link/search/스카이라인루지+부산"},
+      {n:"③ 多鍋美食午餐",lat:35.1770,lng:129.2100,c:"#FF6B6B",time:"11:15",note:"鮑魚釜飯，NT$600/人",k:"https://map.kakao.com/link/search/다솥맛집+송정"},
+      {n:"④ CORALANI咖啡",lat:35.2140,lng:129.2200,c:"#F39C12",time:"下午",note:"海岸邊超大型海景咖啡廳",k:"https://map.kakao.com/link/search/코랄라니+기장"},
+      {n:"⑤ 海東龍宮寺",lat:35.1876,lng:129.2257,c:"#4ECDC4",time:"下午",note:"108階梯，推車無法使用",k:"https://map.kakao.com/link/search/해동용궁사"},
+      {n:"⑥ 國際市場",lat:35.0979,lng:129.0296,c:"#F39C12",time:"傍晚",note:"買棉被＋BIFF廣場小吃",k:"https://map.kakao.com/link/search/국제시장+부산"},
+      {n:"⑦ 南浦洞飯店",lat:35.0974,lng:129.0296,c:"#9B59B6",time:"傍晚",note:"Good Ol'days Hotel",k:"https://map.kakao.com/link/search/Good+Ol+days+Hotel+부산"}
+    ],
+    alt:[
+      {n:"◎ 松亭海水浴場",lat:35.1770,lng:129.2105,c:"#4ECDC4",time:"滑車後",note:"比海雲台安靜",k:"https://map.kakao.com/link/search/송정해수욕장"},
+      {n:"◎ 竹城天主堂",lat:35.2058,lng:129.2256,c:"#9B59B6",time:"機張途中",note:"夢幻海邊小教堂",k:"https://map.kakao.com/link/search/죽성드림성당+기장"},
+      {n:"◎ 龍頭山公園",lat:35.1001,lng:129.0332,c:"#4ECDC4",time:"南浦洞",note:"免費，有釜山塔",k:"https://map.kakao.com/link/search/용두산공원"},
+      {n:"◎ 札嘎其市場",lat:35.0967,lng:129.0253,c:"#FF6B6B",time:"南浦洞",note:"釜山最大海鮮市場",k:"https://map.kakao.com/link/search/자갈치시장"},
+      {n:"◎ 四十階梯文化街",lat:35.1010,lng:129.0335,c:"#4ECDC4",time:"南浦洞",note:"歷史感濃厚",k:"https://map.kakao.com/link/search/40계단+문화관광테마거리"}
+    ]
+  },
+  3: {
+    center:[35.087,129.025], zoom:13,
+    main:[
+      {n:"① EGG DROP早餐",lat:35.0979,lng:129.0296,c:"#FF6B6B",time:"08:00",note:"飯店步行400m",k:"https://map.kakao.com/link/search/에그드랍+남포동"},
+      {n:"② 甘川洞文化村",lat:35.0969,lng:129.0097,c:"#4ECDC4",time:"上午",note:"小王子｜⚠️全區陡坡無推車",k:"https://map.kakao.com/link/search/감천문화마을"},
+      {n:"③ 松島纜車",lat:35.0716,lng:129.0138,c:"#4ECDC4",time:"下午",note:"韓國最長跨海纜車",k:"https://map.kakao.com/link/search/송도해상케이블카"},
+      {n:"④ 海底貝殼王國",lat:35.0718,lng:129.0145,c:"#FF6B6B",time:"午餐",note:"松島纜車站附近烤貝",k:"https://map.kakao.com/link/search/바닷속조개왕국+송도"},
+      {n:"⑤ Arte Museum",lat:35.0840,lng:129.0475,c:"#9B6EC4",time:"下午",note:"全球最大沈浸藝術展",k:"https://map.kakao.com/link/search/아르떼뮤지엄+부산"},
+      {n:"⑥ P.ARK CAFÉ",lat:35.0843,lng:129.0478,c:"#9B6EC4",time:"藝術展後",note:"Miffy周邊＋4F露天",k:"https://map.kakao.com/link/search/P.ARK+CAFE+영도"},
+      {n:"⑦ 南浦蔘雞湯",lat:35.0979,lng:129.0296,c:"#FF6B6B",time:"晚餐",note:"在地人愛店，建議提早去",k:"https://map.kakao.com/link/search/남포삼계탕"}
+    ],
+    alt:[
+      {n:"◎ 松島海水浴場",lat:35.0722,lng:129.0150,c:"#4ECDC4",time:"纜車後",note:"老人休息好去處",k:"https://map.kakao.com/link/search/송도해수욕장"},
+      {n:"◎ 太宗台",lat:35.0432,lng:129.0798,c:"#4ECDC4",time:"影島",note:"懸崖景觀，壯闊海景",k:"https://map.kakao.com/link/search/태종대"},
+      {n:"◎ 白淺灘文化村",lat:35.0860,lng:129.0490,c:"#4ECDC4",time:"影島",note:"P.ARK附近步行可達",k:"https://map.kakao.com/link/search/흰여울문화마을"}
+    ]
+  },
+  4: {
+    center:[35.153,129.055], zoom:14,
+    main:[
+      {n:"① EGG DROP早餐",lat:35.0979,lng:129.0296,c:"#FF6B6B",time:"08:00",note:"退房前早餐",k:"https://map.kakao.com/link/search/에그드랍+남포동"},
+      {n:"② 西面醫美/逛街",lat:35.1545,lng:129.0580,c:"#9B6EC4",time:"上午",note:"醫美診所聚集，地鐵直達",k:"https://map.kakao.com/link/search/서면+부산"},
+      {n:"③ 李在模披薩",lat:35.1540,lng:129.0570,c:"#FF6B6B",time:"午餐",note:"釜山限定！記得App預約",k:"https://map.kakao.com/link/search/이재모피자+서면"},
+      {n:"④ 田浦咖啡街",lat:35.1565,lng:129.0607,c:"#9B6EC4",time:"12:00後",note:"OFF COURSE / Beuraket",k:"https://map.kakao.com/link/search/전포카페거리"},
+      {n:"⑤ 金海國際機場",lat:35.1795,lng:128.9380,c:"#4ECDC4",time:"17:30",note:"CI187 20:00返台",k:"https://map.kakao.com/link/search/김해국제공항"}
+    ],
+    alt:[
+      {n:"◎ Olive Young西面",lat:35.1548,lng:129.0583,c:"#F39C12",time:"西面",note:"保養品購物",k:"https://map.kakao.com/link/search/올리브영+서면"},
+      {n:"◎ Running Man體驗館",lat:35.1535,lng:129.0562,c:"#4ECDC4",time:"西面",note:"小孩超愛，約1.5小時",k:"https://map.kakao.com/link/search/런닝맨체험관+부산"},
+      {n:"◎ 西面吃街",lat:35.1542,lng:129.0575,c:"#FF6B6B",time:"西面",note:"韓式小吃，價格親民",k:"https://map.kakao.com/link/search/서면먹자골목"}
+    ]
   }
+};
 
-  function toggleCard(card) {
-    const wasExpanded = card.classList.contains('expanded');
-    // Close all cards in this day
-    const dayContent = card.closest('.day-content, .optional-section');
-    if (dayContent) {
-      dayContent.querySelectorAll('.spot-card.expanded').forEach(c => {
-        if (c !== card) c.classList.remove('expanded');
-      });
-    }
-    card.classList.toggle('expanded', !wasExpanded);
-  }
+const initializedMaps = {};
 
-  function toggleRain(el) {
-    const content = el.nextElementSibling;
-    content.classList.toggle('open');
-    el.querySelector('span:last-child').textContent =
-      content.classList.contains('open') ? '▾' : '▸';
+function makeIcon(spot, isAlt) {
+  const label = spot.n.replace(/[①②③④⑤⑥⑦◎]/,'').trim().substring(0,6);
+  if (isAlt) {
+    return L.divIcon({
+      className:'',
+      html:`<div style="background:white;color:${spot.c};border:2.5px solid ${spot.c};border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;box-shadow:0 2px 6px rgba(0,0,0,0.2);font-family:sans-serif;text-align:center;line-height:1.1;padding:2px">${label}</div>`,
+      iconSize:[28,28],iconAnchor:[14,14]
+    });
   }
+  const num = spot.n.match(/[①②③④⑤⑥⑦]/)?.[0] || '•';
+  return L.divIcon({
+    className:'',
+    html:`<div style="background:${spot.c};color:white;border:2.5px solid white;border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-family:sans-serif">${num}</div>`,
+    iconSize:[30,30],iconAnchor:[15,15]
+  });
+}
+
+function initMap(dayIdx) {
+  if (initializedMaps[dayIdx]) return;
+  const d = MAPS_DATA[dayIdx];
+  const mapEl = document.getElementById('map'+dayIdx);
+  if (!mapEl || !window.L) return;
+  const map = L.map(mapEl, {center:d.center, zoom:d.zoom, zoomControl:true, attributionControl:false});
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(map);
+
+  [...d.main].forEach(s => {
+    const m = L.marker([s.lat,s.lng],{icon:makeIcon(s,false)}).addTo(map);
+    m.bindPopup(`<div style="font-family:sans-serif;min-width:160px"><b style="font-size:13px;color:#222">${s.n}</b><br><span style="color:#FF8C69;font-size:11px;font-weight:600">⏰ ${s.time}</span><br><span style="color:#666;font-size:11px;line-height:1.5">${s.note}</span><br><br><a href="${s.k}" target="_blank" style="display:inline-block;background:#FF6B35;color:white;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none">🗺️ Kakao 導航</a></div>`,{maxWidth:220});
+  });
+
+  [...d.alt].forEach(s => {
+    const m = L.marker([s.lat,s.lng],{icon:makeIcon(s,true)}).addTo(map);
+    m.bindPopup(`<div style="font-family:sans-serif;min-width:160px"><b style="font-size:13px;color:#888">備案：${s.n.replace('◎ ','')}</b><br><span style="color:#aaa;font-size:11px;font-weight:600">⏰ ${s.time}</span><br><span style="color:#666;font-size:11px;line-height:1.5">${s.note}</span><br><br><a href="${s.k}" target="_blank" style="display:inline-block;background:#888;color:white;border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;text-decoration:none">🗺️ Kakao 導航</a></div>`,{maxWidth:220});
+  });
+
+  initializedMaps[dayIdx] = true;
+}
+
+function switchDay(i) {
+  document.querySelectorAll('.day-content').forEach((el,j)=>el.classList.toggle('active',j===i));
+  document.querySelectorAll('.day-tab').forEach((el,j)=>el.classList.toggle('active',j===i));
+  document.querySelectorAll('.nav-btn').forEach((el,j)=>el.classList.toggle('active',j===i));
+  window.scrollTo({top:0,behavior:'smooth'});
+  const mapPane = document.getElementById('d'+i+'-map');
+  if (mapPane && mapPane.classList.contains('active')) initMap(i);
+}
+
+function switchView(dayIdx, view) {
+  const s = document.getElementById('d'+dayIdx+'-schedule');
+  const m = document.getElementById('d'+dayIdx+'-map');
+  const btns = document.querySelectorAll('#day'+dayIdx+' .view-btn');
+  if (view==='schedule') {
+    s.classList.add('active'); m.classList.remove('active');
+    btns[0].classList.add('active'); btns[1].classList.remove('active');
+  } else {
+    m.classList.add('active'); s.classList.remove('active');
+    btns[1].classList.add('active'); btns[0].classList.remove('active');
+    initMap(dayIdx);
+  }
+}
+
+function toggleCard(card) {
+  const wasExpanded = card.classList.contains('expanded');
+  card.closest('.day-content, .optional-section').querySelectorAll('.spot-card.expanded').forEach(c=>{if(c!==card)c.classList.remove('expanded');});
+  card.classList.toggle('expanded',!wasExpanded);
+}
+
+function toggleRain(el) {
+  const c = el.nextElementSibling;
+  c.classList.toggle('open');
+  el.querySelector('span:last-child').textContent = c.classList.contains('open')?'▾':'▸';
+}
 </script>
-
 </body>
 </html>
